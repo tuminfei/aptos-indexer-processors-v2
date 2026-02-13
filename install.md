@@ -17,6 +17,16 @@ docker run -d \
   -e HASURA_GRAPHQL_ENABLE_CONSOLE=true \
   -e HASURA_GRAPHQL_DEV_MODE=true \
   hasura/graphql-engine:latest
+
+docker run -d \
+    --name hasura \
+    --add-host=host.docker.internal:host-gateway \
+    -p 10000:8080 \
+    -e HASURA_GRAPHQL_DATABASE_URL=postgresql://postgres:@host.docker.internal:5433/indexer_v2 \
+    -e INDEXER_V2_POSTGRES_URL=postgresql://postgres:@host.docker.internal:5433/indexer_v2 \
+    -e HASURA_GRAPHQL_ENABLE_CONSOLE=true \
+    -e HASURA_GRAPHQL_DEV_MODE=true \
+    hasura/graphql-engine:latest
 ```
 
 ### 步骤2：确保processor已经运行并创建了必要的表结构
