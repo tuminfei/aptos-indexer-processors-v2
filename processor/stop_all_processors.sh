@@ -5,7 +5,7 @@
 echo "Stopping all processors..."
 
 # 查找所有处理器进程
-PROCESSORS=$(ps aux | grep "cargo run --release" | grep -v grep)
+PROCESSORS=$(ps aux | grep "./target/release/processor" | grep -v grep)
 
 if [ -z "$PROCESSORS" ]; then
     echo "No processors found running."
