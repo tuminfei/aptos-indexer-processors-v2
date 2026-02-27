@@ -917,17 +917,17 @@ diesel::table! {
         #[max_length = 66]
         owner_address -> Varchar,
         #[max_length = 66]
-        operator_address -> Varchar,
-        rewards_growth -> Numeric,
-        last_epoch -> Int8,
+        operator_address -> Nullable<Varchar>,
+        rewards_growth -> Nullable<Numeric>,
+        last_epoch -> Nullable<Int8>,
         #[max_length = 50]
-        last_epoch_performance -> Varchar,
-        liveness -> Numeric,
+        last_epoch_performance -> Nullable<Varchar>,
+        liveness -> Nullable<Numeric>,
         #[max_length = 50]
-        governance_voting_record -> Varchar,
-        location_stats -> Jsonb,
-        apt_rewards_distributed -> Numeric,
-        epoch -> Int8,
+        governance_voting_record -> Nullable<Varchar>,
+        location_stats -> Nullable<Jsonb>,
+        apt_rewards_distributed -> Nullable<Numeric>,
+        epoch -> Nullable<Int8>,
         #[max_length = 256]
         consensus_pubkey -> Varchar,
         fullnode_addresses -> Text,
