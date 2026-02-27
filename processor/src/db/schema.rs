@@ -912,6 +912,33 @@ diesel::table! {
     }
 }
 
+diesel::table! {
+    validator_stats (owner_address, epoch) {
+        #[max_length = 66]
+        owner_address -> Varchar,
+        #[max_length = 66]
+        operator_address -> Varchar,
+        rewards_growth -> Numeric,
+        last_epoch -> Int8,
+        #[max_length = 50]
+        last_epoch_performance -> Varchar,
+        liveness -> Numeric,
+        #[max_length = 50]
+        governance_voting_record -> Varchar,
+        location_stats -> Jsonb,
+        apt_rewards_distributed -> Numeric,
+        epoch -> Int8,
+        #[max_length = 256]
+        consensus_pubkey -> Varchar,
+        fullnode_addresses -> Text,
+        network_addresses -> Text,
+        validator_index -> Int8,
+        voting_power -> Numeric,
+        created_at -> Timestamp,
+        updated_at -> Timestamp,
+    }
+}
+
 diesel::allow_tables_to_appear_in_same_query!(
     account_transactions,
     ans_lookup_v2,
@@ -963,6 +990,7 @@ diesel::allow_tables_to_appear_in_same_query!(
     token_ownerships_v2,
     transaction_size_info,
     user_transactions,
+    validator_stats,
     write_set_changes,
     write_set_size_info,
 );
