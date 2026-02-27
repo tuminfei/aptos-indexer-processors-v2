@@ -2391,6 +2391,45 @@
                 }
               }
             ]
+          },
+          {
+            "table": {
+              "name": "validator_stats",
+              "schema": "public"
+            },
+            "select_permissions": [
+              {
+                "role": "anonymous",
+                "permission": {
+                  "columns": [
+                    "owner_address",
+                    "operator_address",
+                    "rewards_growth",
+                    "last_epoch",
+                    "last_epoch_performance",
+                    "liveness",
+                    "governance_voting_record",
+                    "location_stats",
+                    "apt_rewards_distributed",
+                    "epoch",
+                    "consensus_pubkey",
+                    "fullnode_addresses",
+                    "network_addresses",
+                    "validator_index",
+                    "voting_power",
+                    "consensus_scheme",
+                    "total_joining_power",
+                    "total_voting_power",
+                    "pending_active",
+                    "pending_inactive",
+                    "created_at",
+                    "updated_at"
+                  ],
+                  "filter": {},
+                  "limit": 100
+                }
+              }
+            ]
           }
         ],
         "configuration": {
