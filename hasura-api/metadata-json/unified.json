@@ -1452,11 +1452,6 @@
                     "network_addresses",
                     "validator_index",
                     "voting_power",
-                    "consensus_scheme",
-                    "total_joining_power",
-                    "total_voting_power",
-                    "pending_active",
-                    "pending_inactive",
                     "created_at",
                     "updated_at"
                   ],
