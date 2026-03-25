@@ -15,6 +15,13 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  License-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check license headers
+        run: python3 scripts/check_license.py --check
+
   Rust:
     runs-on: ubuntu-latest
     steps:
@@ -23,7 +30,7 @@ jobs:
       - uses: dsherret/rust-toolchain-file@v1
       - name: Install deps and run linter
         run: |
-          sudo apt update && sudo apt install libdw-dev
+          sudo apt update && sudo apt install libdw-dev protobuf-compiler
           cargo install cargo-sort
           rustup update
           rustup toolchain install nightly

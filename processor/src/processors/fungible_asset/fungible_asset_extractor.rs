@@ -1,3 +1,6 @@
+// Copyright (c) Aptos Foundation
+// Licensed pursuant to the Innovation-Enabling Source Code License, available at https://github.com/aptos-labs/aptos-core/blob/main/LICENSE
+
 use crate::processors::fungible_asset::{
     fungible_asset_models::{
         v2_fungible_asset_activities::PostgresFungibleAssetActivity,
@@ -17,7 +20,7 @@ use anyhow::Result;
 use aptos_indexer_processor_sdk::{
     aptos_protos::transaction::v1::Transaction,
     postgres::utils::database::ArcDbPool,
-    traits::{async_step::AsyncRunType, AsyncStep, NamedStep, Processable},
+    traits::{AsyncStep, NamedStep, Processable, async_step::AsyncRunType},
     types::transaction_context::TransactionContext,
     utils::errors::ProcessorError,
 };

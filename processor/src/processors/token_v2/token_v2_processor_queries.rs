@@ -1,5 +1,5 @@
-// Copyright © Aptos Foundation
-// SPDX-License-Identifier: Apache-2.0
+// Copyright (c) Aptos Foundation
+// Licensed pursuant to the Innovation-Enabling Source Code License, available at https://github.com/aptos-labs/aptos-core/blob/main/LICENSE
 
 use crate::{
     processors::token_v2::{
@@ -16,10 +16,10 @@ use crate::{
     schema,
 };
 use diesel::{
-    pg::{upsert::excluded, Pg},
+    ExpressionMethods,
+    pg::{Pg, upsert::excluded},
     query_builder::QueryFragment,
     query_dsl::methods::FilterDsl,
-    ExpressionMethods,
 };
 
 pub fn insert_current_collections_v2_query(

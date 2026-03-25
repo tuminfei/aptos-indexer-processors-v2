@@ -1,3 +1,6 @@
+// Copyright (c) Aptos Foundation
+// Licensed pursuant to the Innovation-Enabling Source Code License, available at https://github.com/aptos-labs/aptos-core/blob/main/LICENSE
+
 use ahash::AHashMap;
 use aptos_indexer_processor_sdk::testing_framework::sdk_test_context::SdkTestContext;
 use processor::{
@@ -44,6 +47,7 @@ pub fn setup_stake_processor_config(
                 override_starting_version: transaction_stream_config.starting_version.unwrap(),
                 ending_version: transaction_stream_config.request_ending_version,
             }),
+            progress_health_config: None,
         },
         processor_name,
     )
@@ -57,7 +61,7 @@ mod tests {
         sdk_tests::{
             stake_processor_tests::setup_stake_processor_config,
             test_helpers::{
-                run_processor_test, setup_test_environment, validate_json, DEFAULT_OUTPUT_FOLDER,
+                DEFAULT_OUTPUT_FOLDER, run_processor_test, setup_test_environment, validate_json,
             },
         },
     };
@@ -65,12 +69,11 @@ mod tests {
         cli_parser::get_test_config, database::TestDatabase,
     };
     use aptos_indexer_test_transactions::json_transactions::generated_transactions::{
-        IMPORTED_MAINNET_TXNS_118489_PROPOSAL_VOTE,
+        IMPORTED_MAINNET_TXNS_118489_PROPOSAL_VOTE, IMPORTED_MAINNET_TXNS_4827964_STAKE_INITIALIZE,
         IMPORTED_MAINNET_TXNS_121508544_STAKE_DISTRIBUTE,
         IMPORTED_MAINNET_TXNS_139449359_STAKE_REACTIVATE,
         IMPORTED_MAINNET_TXNS_1830706009_STAKER_GOVERNANCE_RECORD,
         IMPORTED_MAINNET_TXNS_1831971037_STAKE_DELEGATION_POOL,
-        IMPORTED_MAINNET_TXNS_4827964_STAKE_INITIALIZE,
     };
     use processor::processors::stake::stake_processor::StakeProcessor;
 

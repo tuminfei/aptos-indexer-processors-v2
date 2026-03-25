@@ -1,3 +1,6 @@
+// Copyright (c) Aptos Foundation
+// Licensed pursuant to the Innovation-Enabling Source Code License, available at https://github.com/aptos-labs/aptos-core/blob/main/LICENSE
+
 use ahash::AHashMap;
 use aptos_indexer_processor_sdk::testing_framework::sdk_test_context::SdkTestContext;
 use processor::config::{
@@ -36,6 +39,7 @@ pub fn setup_acc_txn_processor_config(
                 override_starting_version: transaction_stream_config.starting_version.unwrap(),
                 ending_version: transaction_stream_config.request_ending_version,
             }),
+            progress_health_config: None,
         },
         processor_name,
     )
@@ -49,7 +53,7 @@ mod tests {
         sdk_tests::{
             account_transaction_processor_tests::setup_acc_txn_processor_config,
             test_helpers::{
-                run_processor_test, setup_test_environment, validate_json, DEFAULT_OUTPUT_FOLDER,
+                DEFAULT_OUTPUT_FOLDER, run_processor_test, setup_test_environment, validate_json,
             },
         },
     };

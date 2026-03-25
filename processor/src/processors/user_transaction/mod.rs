@@ -1,3 +1,6 @@
+// Copyright (c) Aptos Foundation
+// Licensed pursuant to the Innovation-Enabling Source Code License, available at https://github.com/aptos-labs/aptos-core/blob/main/LICENSE
+
 pub mod models;
 pub mod user_transaction_extractor;
 pub mod user_transaction_processor;
@@ -13,7 +16,7 @@ use crate::{
     utils::counters::PROCESSOR_UNKNOWN_TYPE_COUNT,
 };
 use aptos_indexer_processor_sdk::aptos_protos::transaction::v1::{
-    transaction::TxnData, Transaction,
+    Transaction, transaction::TxnData,
 };
 
 /// Helper function to parse user transactions and signatures from the transaction data.

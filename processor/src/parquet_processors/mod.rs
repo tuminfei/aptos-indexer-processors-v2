@@ -1,10 +1,13 @@
+// Copyright (c) Aptos Foundation
+// Licensed pursuant to the Innovation-Enabling Source Code License, available at https://github.com/aptos-labs/aptos-core/blob/main/LICENSE
+
 use crate::{
     config::db_config::DbConfig,
     parquet_processors::{
         parquet_events::parquet_events_model::ParquetEvent,
         parquet_transaction_metadata::transaction_metadata_models::write_set_size_info::ParquetWriteSetSize,
         parquet_utils::{
-            gcs_uploader::{create_new_writer, GCSUploader},
+            gcs_uploader::{GCSUploader, create_new_writer},
             parquet_buffer_step::ParquetBufferStep,
         },
     },
@@ -54,7 +57,7 @@ use crate::{
     utils::table_flags::TableFlags,
 };
 use aptos_indexer_processor_sdk::{
-    postgres::utils::database::{new_db_pool, ArcDbPool},
+    postgres::utils::database::{ArcDbPool, new_db_pool},
     utils::errors::ProcessorError,
 };
 use async_trait::async_trait;
@@ -634,7 +637,8 @@ impl ParquetTypeStructs {
 
 async fn initialize_gcs_client(credentials: Option<String>) -> Arc<GCSClient> {
     if let Some(credentials) = credentials {
-        std::env::set_var(GOOGLE_APPLICATION_CREDENTIALS, credentials);
+        // SAFETY: This is called during single-threaded initialization before any concurrent work.
+        unsafe { std::env::set_var(GOOGLE_APPLICATION_CREDENTIALS, credentials) };
     }
 
     let gcs_config = GcsClientConfig::default()
@@ -648,7 +652,7 @@ async fn initialize_gcs_client(credentials: Option<String>) -> Arc<GCSClient> {
 /// Initializes the database connection pool.
 async fn initialize_database_pool(config: &DbConfig) -> anyhow::Result<ArcDbPool> {
     match config {
-        DbConfig::ParquetConfig(ref parquet_config) => {
+        DbConfig::ParquetConfig(parquet_config) => {
             let conn_pool = new_db_pool(
                 &parquet_config.connection_string,
                 Some(parquet_config.db_pool_size),
@@ -721,7 +725,8 @@ pub trait ParquetProcessorTrait {
 
     fn set_google_credentials(&self, credentials: Option<String>) {
         if let Some(credentials) = credentials {
-            std::env::set_var(GOOGLE_APPLICATION_CREDENTIALS, credentials);
+            // SAFETY: This is called during single-threaded initialization before any concurrent work.
+            unsafe { std::env::set_var(GOOGLE_APPLICATION_CREDENTIALS, credentials) };
         }
     }
 }

@@ -1,5 +1,5 @@
-// Copyright © Aptos Foundation
-// SPDX-License-Identifier: Apache-2.0
+// Copyright (c) Aptos Foundation
+// Licensed pursuant to the Innovation-Enabling Source Code License, available at https://github.com/aptos-labs/aptos-core/blob/main/LICENSE
 
 #![allow(clippy::extra_unused_lifetimes)]
 
@@ -17,8 +17,8 @@ use allocative_derive::Allocative;
 use anyhow::Context;
 use aptos_indexer_processor_sdk::{
     aptos_protos::transaction::v1::{
-        write_set_change::{Change as WriteSetChangeEnum, Type as WriteSetChangeTypeEnum},
         WriteSetChange as WriteSetChangePB,
+        write_set_change::{Change as WriteSetChangeEnum, Type as WriteSetChangeTypeEnum},
     },
     utils::convert::{standardize_address, standardize_address_from_bytes},
 };

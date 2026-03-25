@@ -1,3 +1,6 @@
+// Copyright (c) Aptos Foundation
+// Licensed pursuant to the Innovation-Enabling Source Code License, available at https://github.com/aptos-labs/aptos-core/blob/main/LICENSE
+
 use super::models::move_modules::PostgresMoveModule;
 use crate::processors::default::{
     models::{
@@ -8,7 +11,7 @@ use crate::processors::default::{
 };
 use aptos_indexer_processor_sdk::{
     aptos_protos::transaction::v1::Transaction,
-    traits::{async_step::AsyncRunType, AsyncStep, NamedStep, Processable},
+    traits::{AsyncStep, NamedStep, Processable, async_step::AsyncRunType},
     types::transaction_context::TransactionContext,
     utils::errors::ProcessorError,
 };

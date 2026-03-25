@@ -1,5 +1,5 @@
-// Copyright © Aptos Foundation
-// SPDX-License-Identifier: Apache-2.0
+// Copyright (c) Aptos Foundation
+// Licensed pursuant to the Innovation-Enabling Source Code License, available at https://github.com/aptos-labs/aptos-core/blob/main/LICENSE
 
 pub mod models;
 pub mod stake_extractor;
@@ -20,7 +20,7 @@ use crate::processors::stake::models::{
 use ahash::AHashMap;
 use aptos_indexer_processor_sdk::{
     aptos_indexer_transaction_stream::utils::time::parse_timestamp,
-    aptos_protos::transaction::v1::{write_set_change::Change, Transaction},
+    aptos_protos::transaction::v1::{Transaction, write_set_change::Change},
     postgres::utils::database::DbPoolConnection,
     utils::convert::standardize_address,
 };
@@ -151,8 +151,8 @@ pub async fn parse_stake_data(
 
             // we need one last loop to prefill delegators that got in before the delegated voting contract was deployed
             for wsc in &transaction_info.changes {
-                if let Change::WriteTableItem(write_table_item) = wsc.change.as_ref().unwrap() {
-                    if let Some(voter) =
+                if let Change::WriteTableItem(write_table_item) = wsc.change.as_ref().unwrap()
+                    && let Some(voter) =
                         CurrentDelegatedVoter::get_delegators_pre_contract_deployment(
                             write_table_item,
                             txn_version,
@@ -165,9 +165,8 @@ pub async fn parse_stake_data(
                         )
                         .await
                         .unwrap()
-                    {
-                        all_current_delegated_voter.insert(voter.pk(), voter);
-                    }
+                {
+                    all_current_delegated_voter.insert(voter.pk(), voter);
                 }
             }
         }

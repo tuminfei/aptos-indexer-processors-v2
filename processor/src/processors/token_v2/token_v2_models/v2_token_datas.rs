@@ -1,5 +1,5 @@
-// Copyright © Aptos Foundation
-// SPDX-License-Identifier: Apache-2.0
+// Copyright (c) Aptos Foundation
+// Licensed pursuant to the Innovation-Enabling Source Code License, available at https://github.com/aptos-labs/aptos-core/blob/main/LICENSE
 
 // This is required because a diesel macro makes clippy sad
 #![allow(clippy::extra_unused_lifetimes)]
@@ -13,7 +13,7 @@ use crate::{
         token_v2::{
             token_models::token_utils::TokenWriteSet,
             token_v2_models::v2_token_utils::{
-                TokenStandard, TokenV2, TokenV2Burned, DEFAULT_NONE,
+                DEFAULT_NONE, TokenStandard, TokenV2, TokenV2Burned,
             },
         },
     },

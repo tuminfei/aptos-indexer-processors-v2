@@ -1,3 +1,6 @@
+// Copyright (c) Aptos Foundation
+// Licensed pursuant to the Innovation-Enabling Source Code License, available at https://github.com/aptos-labs/aptos-core/blob/main/LICENSE
+
 #![allow(clippy::extra_unused_lifetimes)]
 
 use crate::{
@@ -8,7 +11,7 @@ use allocative_derive::Allocative;
 use aptos_indexer_processor_sdk::{
     aptos_indexer_transaction_stream::utils::time::parse_timestamp,
     aptos_protos::transaction::v1::{
-        transaction::TxnData, Event as EventPB, EventSizeInfo, Transaction,
+        Event as EventPB, EventSizeInfo, Transaction, transaction::TxnData,
     },
     utils::convert::{standardize_address, truncate_str},
 };

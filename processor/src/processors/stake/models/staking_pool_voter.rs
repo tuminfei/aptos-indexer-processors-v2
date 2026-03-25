@@ -1,5 +1,5 @@
-// Copyright © Aptos Foundation
-// SPDX-License-Identifier: Apache-2.0
+// Copyright (c) Aptos Foundation
+// Licensed pursuant to the Innovation-Enabling Source Code License, available at https://github.com/aptos-labs/aptos-core/blob/main/LICENSE
 
 // This is required because a diesel macro makes clippy sad
 #![allow(clippy::extra_unused_lifetimes)]
@@ -10,7 +10,7 @@ use crate::{
 use ahash::AHashMap;
 use aptos_indexer_processor_sdk::{
     aptos_indexer_transaction_stream::utils::time::parse_timestamp,
-    aptos_protos::transaction::v1::{write_set_change::Change, Transaction},
+    aptos_protos::transaction::v1::{Transaction, write_set_change::Change},
     utils::convert::standardize_address,
 };
 use field_count::FieldCount;
@@ -38,22 +38,21 @@ impl CurrentStakingPoolVoter {
             .expect("Transaction timestamp doesn't exist!");
         let block_timestamp = parse_timestamp(timestamp, txn_version).naive_utc();
         for wsc in &transaction.info.as_ref().unwrap().changes {
-            if let Change::WriteResource(write_resource) = wsc.change.as_ref().unwrap() {
-                if let Some(StakeResource::StakePool(inner)) = StakeResource::from_write_resource(
+            if let Change::WriteResource(write_resource) = wsc.change.as_ref().unwrap()
+                && let Some(StakeResource::StakePool(inner)) = StakeResource::from_write_resource(
                     write_resource,
                     txn_version,
                     block_timestamp,
-                )? {
-                    let staking_pool_address =
-                        standardize_address(&write_resource.address.to_string());
-                    staking_pool_voters.insert(staking_pool_address.clone(), Self {
-                        staking_pool_address,
-                        voter_address: inner.get_delegated_voter(),
-                        last_transaction_version: txn_version,
-                        operator_address: inner.get_operator_address(),
-                        block_timestamp,
-                    });
-                }
+                )?
+            {
+                let staking_pool_address = standardize_address(&write_resource.address.to_string());
+                staking_pool_voters.insert(staking_pool_address.clone(), Self {
+                    staking_pool_address,
+                    voter_address: inner.get_delegated_voter(),
+                    last_transaction_version: txn_version,
+                    operator_address: inner.get_operator_address(),
+                    block_timestamp,
+                });
             }
         }
 

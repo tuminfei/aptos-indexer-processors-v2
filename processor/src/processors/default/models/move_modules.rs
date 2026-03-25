@@ -1,5 +1,5 @@
-// Copyright © Aptos Foundation
-// SPDX-License-Identifier: Apache-2.0
+// Copyright (c) Aptos Foundation
+// Licensed pursuant to the Innovation-Enabling Source Code License, available at https://github.com/aptos-labs/aptos-core/blob/main/LICENSE
 
 #![allow(clippy::extra_unused_lifetimes)]
 
@@ -228,7 +228,7 @@ impl From<MoveModule> for PostgresMoveModule {
 #[cfg(test)]
 mod tests {
     use aptos_indexer_processor_sdk::aptos_protos::transaction::v1::{
-        move_function::Visibility, MoveFunction, MoveType, MoveTypes,
+        MoveFunction, MoveType, MoveTypes, move_function::Visibility,
     };
 
     /// Regression test: MoveFunction with signed integer types must serialize without panic.

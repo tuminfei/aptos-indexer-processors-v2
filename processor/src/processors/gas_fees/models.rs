@@ -1,3 +1,6 @@
+// Copyright (c) Aptos Foundation
+// Licensed pursuant to the Innovation-Enabling Source Code License, available at https://github.com/aptos-labs/aptos-core/blob/main/LICENSE
+
 use crate::{
     processors::{
         fungible_asset::fungible_asset_models::v2_fungible_asset_utils::FeeStatement,
@@ -8,7 +11,7 @@ use crate::{
 use aptos_indexer_processor_sdk::{
     aptos_indexer_transaction_stream::utils::time::parse_timestamp,
     aptos_protos::transaction::v1::{
-        transaction::TxnData, Transaction, TransactionInfo, UserTransactionRequest,
+        Transaction, TransactionInfo, UserTransactionRequest, transaction::TxnData,
     },
     utils::{
         convert::{standardize_address, u64_to_bigdecimal},

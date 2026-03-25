@@ -1,5 +1,5 @@
-// Copyright © Aptos Foundation
-// SPDX-License-Identifier: Apache-2.0
+// Copyright (c) Aptos Foundation
+// Licensed pursuant to the Innovation-Enabling Source Code License, available at https://github.com/aptos-labs/aptos-core/blob/main/LICENSE
 
 // This is required because a diesel macro makes clippy sad
 #![allow(clippy::extra_unused_lifetimes)]
@@ -15,8 +15,8 @@ use aptos_indexer_processor_sdk::{
     utils::{
         convert::{deserialize_from_string, standardize_address, truncate_str},
         extract::{
-            deserialize_token_object_property_map_from_bcs_hexstring, Aggregator,
-            AggregatorSnapshot, DerivedStringSnapshot,
+            Aggregator, AggregatorSnapshot, DerivedStringSnapshot,
+            deserialize_token_object_property_map_from_bcs_hexstring,
         },
     },
 };

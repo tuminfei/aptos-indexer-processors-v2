@@ -1,5 +1,5 @@
-// Copyright © Aptos Foundation
-// SPDX-License-Identifier: Apache-2.0
+// Copyright (c) Aptos Foundation
+// Licensed pursuant to the Innovation-Enabling Source Code License, available at https://github.com/aptos-labs/aptos-core/blob/main/LICENSE
 
 // TODO: add back all models and configs back as we migrate
 use crate::{
@@ -7,7 +7,7 @@ use crate::{
         parquet_ans::parquet_ans_processor::ParquetAnsProcessorConfig,
         parquet_events::parquet_events_model::ParquetEvent,
         parquet_transaction_metadata::transaction_metadata_models::write_set_size_info::ParquetWriteSetSize,
-        parquet_utils::util::{format_table_name, NamedTable, VALID_TABLE_NAMES},
+        parquet_utils::util::{NamedTable, VALID_TABLE_NAMES, format_table_name},
     },
     processors::{
         account_transactions::account_transactions_model::ParquetAccountTransaction,
@@ -26,6 +26,7 @@ use crate::{
             transactions::ParquetTransaction,
             write_set_changes::ParquetWriteSetChange,
         },
+        event_file::event_file_config::EventFileProcessorConfig,
         fungible_asset::fungible_asset_models::{
             v2_fungible_asset_activities::ParquetFungibleAssetActivity,
             v2_fungible_asset_balances::ParquetFungibleAssetBalance,
@@ -109,6 +110,8 @@ pub enum ProcessorConfig {
     ObjectsProcessor(ObjectsProcessorConfig),
     MonitoringProcessor(DefaultProcessorConfig),
     GasFeeProcessor(DefaultProcessorConfig),
+    // Event file processor (GCS-based, no DB)
+    EventFileProcessor(EventFileProcessorConfig),
     // ParquetProcessor
     ParquetDefaultProcessor(ParquetDefaultProcessorConfig),
     ParquetObjectsProcessor(ParquetDefaultProcessorConfig),
@@ -150,7 +153,7 @@ impl ProcessorConfig {
                 return Err(anyhow::anyhow!(
                     "Invalid parquet processor config: {:?}",
                     self
-                ))
+                ));
             },
         };
 

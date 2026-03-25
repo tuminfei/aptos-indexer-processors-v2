@@ -1,5 +1,5 @@
-// Copyright © Aptos Foundation
-// SPDX-License-Identifier: Apache-2.0
+// Copyright (c) Aptos Foundation
+// Licensed pursuant to the Innovation-Enabling Source Code License, available at https://github.com/aptos-labs/aptos-core/blob/main/LICENSE
 
 use crate::{
     filter_datasets,
@@ -11,22 +11,22 @@ use crate::{
         },
     },
     schema,
-    utils::table_flags::{filter_data, TableFlags},
+    utils::table_flags::{TableFlags, filter_data},
 };
 use ahash::AHashMap;
 use anyhow::Result;
 use aptos_indexer_processor_sdk::{
-    postgres::utils::database::{execute_in_chunks, get_config_table_chunk_size, ArcDbPool},
-    traits::{async_step::AsyncRunType, AsyncStep, NamedStep, Processable},
+    postgres::utils::database::{ArcDbPool, execute_in_chunks, get_config_table_chunk_size},
+    traits::{AsyncStep, NamedStep, Processable, async_step::AsyncRunType},
     types::transaction_context::TransactionContext,
     utils::errors::ProcessorError,
 };
 use async_trait::async_trait;
 use diesel::{
-    pg::{upsert::excluded, Pg},
+    ExpressionMethods,
+    pg::{Pg, upsert::excluded},
     query_builder::QueryFragment,
     query_dsl::methods::FilterDsl,
-    ExpressionMethods,
 };
 
 pub struct AnsStorer

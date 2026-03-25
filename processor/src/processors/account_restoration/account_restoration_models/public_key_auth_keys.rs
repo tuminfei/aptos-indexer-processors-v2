@@ -1,5 +1,5 @@
-// Copyright © Aptos Foundation
-// SPDX-License-Identifier: Apache-2.0
+// Copyright (c) Aptos Foundation
+// Licensed pursuant to the Innovation-Enabling Source Code License, available at https://github.com/aptos-labs/aptos-core/blob/main/LICENSE
 
 use super::account_restoration_utils::KeyRotationToPublicKeyEvent;
 use crate::{
@@ -14,10 +14,10 @@ use crate::{
 };
 use ahash::AHashMap;
 use aptos_indexer_processor_sdk::aptos_protos::transaction::v1::{
+    AnyPublicKey, MultiEd25519Signature, MultiKeySignature, Signature,
     account_signature::{Signature as AccountSignature, Type as AccountSignatureTypeEnum},
     any_public_key::Type as AnyPublicKeyEnum,
     signature::Signature as SignatureEnum,
-    AnyPublicKey, MultiEd25519Signature, MultiKeySignature, Signature,
 };
 use field_count::FieldCount;
 use serde::{Deserialize, Serialize};

@@ -1,6 +1,9 @@
+// Copyright (c) Aptos Foundation
+// Licensed pursuant to the Innovation-Enabling Source Code License, available at https://github.com/aptos-labs/aptos-core/blob/main/LICENSE
+
 use crate::models::account_restoration_models::{AuthKeyAccountAddress, PublicKeyAuthKey};
 use anyhow::Result;
-use diesel::{query_dsl::methods::ThenOrderDsl, ExpressionMethods, PgConnection, RunQueryDsl};
+use diesel::{ExpressionMethods, PgConnection, RunQueryDsl, query_dsl::methods::ThenOrderDsl};
 use processor::schema::{
     auth_key_account_addresses::dsl as aa_dsl, public_key_auth_keys::dsl as pa_dsl,
 };

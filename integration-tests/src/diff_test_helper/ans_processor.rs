@@ -1,6 +1,9 @@
+// Copyright (c) Aptos Foundation
+// Licensed pursuant to the Innovation-Enabling Source Code License, available at https://github.com/aptos-labs/aptos-core/blob/main/LICENSE
+
 use crate::models::ans_models::{CurrentAnsLookupV2, CurrentAnsPrimaryNameV2};
 use anyhow::Result;
-use diesel::{pg::PgConnection, query_dsl::methods::ThenOrderDsl, ExpressionMethods, RunQueryDsl};
+use diesel::{ExpressionMethods, RunQueryDsl, pg::PgConnection, query_dsl::methods::ThenOrderDsl};
 use processor::schema::{
     current_ans_lookup_v2::dsl as cal_v2_dsl, current_ans_primary_name_v2::dsl as capn_v2_dsl,
 };

@@ -1,5 +1,5 @@
-// Copyright © Aptos Foundation
-// SPDX-License-Identifier: Apache-2.0
+// Copyright (c) Aptos Foundation
+// Licensed pursuant to the Innovation-Enabling Source Code License, available at https://github.com/aptos-labs/aptos-core/blob/main/LICENSE
 
 // This is required because a diesel macro makes clippy sad
 #![allow(clippy::extra_unused_lifetimes)]
@@ -151,7 +151,7 @@ impl Object {
                     return Err(anyhow::anyhow!(
                         "Error getting resource from delete resource: {}",
                         e
-                    ))
+                    ));
                 },
             };
 
@@ -200,11 +200,11 @@ impl Object {
                         Ok(object) => object,
                         Err(_) => {
                             tracing::error!(
-                            transaction_version = txn_version,
-                            lookup_key = &resource.resource_address,
-                            "Missing current_object for object_address: {}. You probably should backfill db.",
-                            resource.resource_address,
-                        );
+                                transaction_version = txn_version,
+                                lookup_key = &resource.resource_address,
+                                "Missing current_object for object_address: {}. You probably should backfill db.",
+                                resource.resource_address,
+                            );
                             return Ok(None);
                         },
                     }

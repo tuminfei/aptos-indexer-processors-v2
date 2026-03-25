@@ -1,9 +1,12 @@
+// Copyright (c) Aptos Foundation
+// Licensed pursuant to the Innovation-Enabling Source Code License, available at https://github.com/aptos-labs/aptos-core/blob/main/LICENSE
+
 use crate::models::fa_v2_models::{
     CurrentUnifiedFungibleAssetBalance, FungibleAssetActivity, FungibleAssetBalance,
     FungibleAssetMetadataModel,
 };
 use anyhow::Result;
-use diesel::{pg::PgConnection, ExpressionMethods, QueryDsl, RunQueryDsl};
+use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, pg::PgConnection};
 use processor::schema::{
     current_fungible_asset_balances::dsl as cfab_dsl, fungible_asset_activities::dsl as faa_dsl,
     fungible_asset_balances::dsl as fab_dsl, fungible_asset_metadata::dsl as fam_dsl,

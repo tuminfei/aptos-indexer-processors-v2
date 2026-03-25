@@ -1,3 +1,6 @@
+// Copyright (c) Aptos Foundation
+// Licensed pursuant to the Innovation-Enabling Source Code License, available at https://github.com/aptos-labs/aptos-core/blob/main/LICENSE
+
 use ahash::AHashMap;
 use aptos_indexer_processor_sdk::testing_framework::sdk_test_context::SdkTestContext;
 use processor::config::{
@@ -37,6 +40,7 @@ pub fn setup_account_restoration_processor_config(
                 override_starting_version: transaction_stream_config.starting_version.unwrap(),
                 ending_version: transaction_stream_config.request_ending_version,
             }),
+            progress_health_config: None,
         },
         processor_name,
     )
@@ -48,7 +52,7 @@ mod sdk_account_restoration_processor_tests {
     use super::setup_account_restoration_processor_config;
     use crate::{
         diff_test_helper::account_restoration_processor::load_data,
-        sdk_tests::test_helpers::{run_processor_test, validate_json, DEFAULT_OUTPUT_FOLDER},
+        sdk_tests::test_helpers::{DEFAULT_OUTPUT_FOLDER, run_processor_test, validate_json},
     };
     use aptos_indexer_processor_sdk::testing_framework::{
         cli_parser::get_test_config,
@@ -268,19 +272,18 @@ mod sdk_account_restoration_processor_tests {
         let db_url = db.get_db_url();
         let (mut indexer_processor_config, processor_name) =
             setup_account_restoration_processor_config(test_context, &db_url);
-        if let Some(chunk_size) = chunk_size {
-            if let ProcessorConfig::AccountRestorationProcessor(ref mut config) =
+        if let Some(chunk_size) = chunk_size
+            && let ProcessorConfig::AccountRestorationProcessor(ref mut config) =
                 indexer_processor_config.processor_config
-            {
-                for table_name in [
-                    "auth_key_account_address",
-                    "auth_key_multikey_layout",
-                    "public_key_auth_key",
-                ] {
-                    config
-                        .per_table_chunk_sizes
-                        .insert(table_name.to_string(), chunk_size);
-                }
+        {
+            for table_name in [
+                "auth_key_account_address",
+                "auth_key_multikey_layout",
+                "public_key_auth_key",
+            ] {
+                config
+                    .per_table_chunk_sizes
+                    .insert(table_name.to_string(), chunk_size);
             }
         }
         let account_restoration_processor =

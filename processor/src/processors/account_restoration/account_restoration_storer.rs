@@ -1,3 +1,6 @@
+// Copyright (c) Aptos Foundation
+// Licensed pursuant to the Innovation-Enabling Source Code License, available at https://github.com/aptos-labs/aptos-core/blob/main/LICENSE
+
 use crate::{
     config::processor_config::DefaultProcessorConfig,
     filter_datasets,
@@ -5,22 +8,22 @@ use crate::{
         auth_key_account_addresses::AuthKeyAccountAddress, public_key_auth_keys::PublicKeyAuthKey,
     },
     schema,
-    utils::table_flags::{filter_data, TableFlags},
+    utils::table_flags::{TableFlags, filter_data},
 };
 use ahash::AHashMap;
 use anyhow::Result;
 use aptos_indexer_processor_sdk::{
-    postgres::utils::database::{execute_in_chunks, get_config_table_chunk_size, ArcDbPool},
+    postgres::utils::database::{ArcDbPool, execute_in_chunks, get_config_table_chunk_size},
     traits::{AsyncRunType, AsyncStep, NamedStep, Processable},
     types::transaction_context::TransactionContext,
     utils::errors::ProcessorError,
 };
 use async_trait::async_trait;
 use diesel::{
-    pg::{upsert::excluded, Pg},
+    ExpressionMethods, IntoSql,
+    pg::{Pg, upsert::excluded},
     query_builder::QueryFragment,
     query_dsl::methods::FilterDsl,
-    ExpressionMethods, IntoSql,
 };
 
 pub struct AccountRestorationStorer

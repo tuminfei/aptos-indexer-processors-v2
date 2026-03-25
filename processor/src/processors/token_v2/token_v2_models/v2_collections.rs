@@ -1,5 +1,5 @@
-// Copyright © Aptos Foundation
-// SPDX-License-Identifier: Apache-2.0
+// Copyright (c) Aptos Foundation
+// Licensed pursuant to the Innovation-Enabling Source Code License, available at https://github.com/aptos-labs/aptos-core/blob/main/LICENSE
 
 // This is required because a diesel macro makes clippy sad
 #![allow(clippy::extra_unused_lifetimes)]
@@ -126,7 +126,7 @@ impl CollectionV2 {
                 if let Some(supply) = concurrent_supply {
                     (current_supply, max_supply, total_minted_v2) = (
                         supply.current_supply.value.clone(),
-                        if supply.current_supply.max_value == BigDecimal::from(u64::MAX) {
+                        if supply.current_supply.max_value == u64::MAX {
                             None
                         } else {
                             Some(supply.current_supply.max_value.clone())
@@ -249,10 +249,10 @@ impl CollectionV2 {
                             Ok(ca) => ca,
                             Err(_) => {
                                 tracing::warn!(
-                                        transaction_version = txn_version,
-                                        lookup_key = &table_handle,
-                                        "Failed to get collection creator for table handle {table_handle}, txn version {txn_version}. You probably should backfill db."
-                                    );
+                                    transaction_version = txn_version,
+                                    lookup_key = &table_handle,
+                                    "Failed to get collection creator for table handle {table_handle}, txn version {txn_version}. You probably should backfill db."
+                                );
                                 return Ok(None);
                             },
                         }

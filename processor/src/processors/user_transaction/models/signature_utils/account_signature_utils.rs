@@ -1,5 +1,5 @@
-// Copyright © Aptos Foundation
-// SPDX-License-Identifier: Apache-2.0
+// Copyright (c) Aptos Foundation
+// Licensed pursuant to the Innovation-Enabling Source Code License, available at https://github.com/aptos-labs/aptos-core/blob/main/LICENSE
 
 use super::{
     any_public_key_utils::get_any_public_key_type,
@@ -9,8 +9,8 @@ use super::{
 use crate::processors::user_transaction::models::signatures::Signature;
 use aptos_indexer_processor_sdk::{
     aptos_protos::transaction::v1::{
-        account_signature::{Signature as AccountSignatureEnum, Type as AccountSignatureTypeEnum},
         AbstractSignature, AccountSignature, MultiKeySignature, SingleKeySignature,
+        account_signature::{Signature as AccountSignatureEnum, Type as AccountSignatureTypeEnum},
     },
     utils::convert::standardize_address,
 };

@@ -1,3 +1,6 @@
+// Copyright (c) Aptos Foundation
+// Licensed pursuant to the Innovation-Enabling Source Code License, available at https://github.com/aptos-labs/aptos-core/blob/main/LICENSE
+
 use serde::{Deserialize, Serialize};
 
 /// This enum captures the configs for all the different db storages that are defined.
@@ -33,6 +36,19 @@ use serde::{Deserialize, Serialize};
 pub enum DbConfig {
     PostgresConfig(PostgresConfig),
     ParquetConfig(ParquetConfig),
+    /// Used by processors that do not need a database (e.g. the event file
+    /// processor which writes directly to GCS).
+    NoneConfig,
+}
+
+impl DbConfig {
+    pub fn connection_string(&self) -> &str {
+        match self {
+            DbConfig::PostgresConfig(config) => &config.connection_string,
+            DbConfig::ParquetConfig(config) => &config.connection_string,
+            DbConfig::NoneConfig => "",
+        }
+    }
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]

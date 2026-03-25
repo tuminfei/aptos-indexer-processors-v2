@@ -1,5 +1,5 @@
-// Copyright © Aptos Foundation
-// SPDX-License-Identifier: Apache-2.0
+// Copyright (c) Aptos Foundation
+// Licensed pursuant to the Innovation-Enabling Source Code License, available at https://github.com/aptos-labs/aptos-core/blob/main/LICENSE
 
 use super::{
     db_config::DbConfig, processor_config::ProcessorConfig, processor_mode::ProcessorMode,
@@ -21,6 +21,7 @@ use crate::{
         account_restoration::account_restoration_processor::AccountRestorationProcessor,
         account_transactions::account_transactions_processor::AccountTransactionsProcessor,
         ans::ans_processor::AnsProcessor, default::default_processor::DefaultProcessor,
+        event_file::event_file_processor::EventFileProcessor,
         fungible_asset::fungible_asset_processor::FungibleAssetProcessor,
         gas_fees::gas_fee_processor::GasFeeProcessor,
         monitoring::monitoring_processor::MonitoringProcessor,
@@ -31,7 +32,8 @@ use crate::{
 };
 use anyhow::Result;
 use aptos_indexer_processor_sdk::{
-    aptos_indexer_transaction_stream::TransactionStreamConfig, server_framework::RunnableConfig,
+    aptos_indexer_transaction_stream::TransactionStreamConfig,
+    server_framework::{ProgressHealthConfig, RunnableConfig},
     traits::processor_trait::ProcessorTrait,
 };
 use serde::{Deserialize, Serialize};
@@ -46,6 +48,15 @@ pub struct IndexerProcessorConfig {
     pub transaction_stream_config: TransactionStreamConfig,
     pub db_config: DbConfig,
     pub processor_mode: ProcessorMode,
+    /// Optional configuration for progress-based liveness checking. When set, the `/healthz`
+    /// endpoint returns 503 if the processor hasn't updated its status within the threshold.
+    /// Enabled by default with the SDK default threshold (45s).
+    #[serde(default = "default_progress_health_config")]
+    pub progress_health_config: Option<ProgressHealthConfig>,
+}
+
+fn default_progress_health_config() -> Option<ProgressHealthConfig> {
+    Some(ProgressHealthConfig::default())
 }
 
 #[async_trait::async_trait]
@@ -91,6 +102,10 @@ impl RunnableConfig for IndexerProcessorConfig {
             ProcessorConfig::ObjectsProcessor(_) => {
                 let objects_processor = ObjectsProcessor::new(self.clone()).await?;
                 objects_processor.run_processor().await
+            },
+            ProcessorConfig::EventFileProcessor(_) => {
+                let event_file_processor = EventFileProcessor::new(self.clone()).await?;
+                event_file_processor.run_processor().await
             },
             ProcessorConfig::GasFeeProcessor(_) => {
                 let gas_fee_processor = GasFeeProcessor::new(self.clone()).await?;

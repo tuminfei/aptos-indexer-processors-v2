@@ -1,8 +1,8 @@
-// Copyright © Aptos Foundation
-// SPDX-License-Identifier: Apache-2.0
+// Copyright (c) Aptos Foundation
+// Licensed pursuant to the Innovation-Enabling Source Code License, available at https://github.com/aptos-labs/aptos-core/blob/main/LICENSE
 
 use aptos_indexer_processor_sdk::aptos_protos::transaction::v1::{
-    any_public_key::Type as AnyPublicKeyEnum, AnyPublicKey,
+    AnyPublicKey, any_public_key::Type as AnyPublicKeyEnum,
 };
 
 pub fn get_any_public_key_type(any_public_key: &AnyPublicKey) -> String {

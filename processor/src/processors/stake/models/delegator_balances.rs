@@ -1,4 +1,5 @@
-// Copyright © Aptos Foundation
+// Copyright (c) Aptos Foundation
+// Licensed pursuant to the Innovation-Enabling Source Code License, available at https://github.com/aptos-labs/aptos-core/blob/main/LICENSE
 
 // This is required because a diesel macro makes clippy sad
 #![allow(clippy::extra_unused_lifetimes)]
@@ -18,7 +19,7 @@ use anyhow::Context;
 use aptos_indexer_processor_sdk::{
     aptos_indexer_transaction_stream::utils::time::parse_timestamp,
     aptos_protos::transaction::v1::{
-        write_set_change::Change, DeleteTableItem, Transaction, WriteResource, WriteTableItem,
+        DeleteTableItem, Transaction, WriteResource, WriteTableItem, write_set_change::Change,
     },
     postgres::utils::database::DbPoolConnection,
     utils::convert::standardize_address,
@@ -453,24 +454,22 @@ impl CurrentDelegatorBalance {
         let changes = &transaction.info.as_ref().unwrap().changes;
         // Do a first pass to get the mapping of active_share table handles to staking pool resource        let txn_version = transaction.version as i64;
         for wsc in changes {
-            if let Change::WriteResource(write_resource) = wsc.change.as_ref().unwrap() {
-                if let Some(map) = Self::get_inactive_pool_to_staking_pool_mapping(
+            if let Change::WriteResource(write_resource) = wsc.change.as_ref().unwrap()
+                && let Some(map) = Self::get_inactive_pool_to_staking_pool_mapping(
                     write_resource,
                     txn_version,
                     txn_timestamp,
                 )
                 .unwrap()
-                {
-                    inactive_pool_to_staking_pool.extend(map);
-                }
+            {
+                inactive_pool_to_staking_pool.extend(map);
             }
 
-            if let Change::WriteTableItem(table_item) = wsc.change.as_ref().unwrap() {
-                if let Some(map) =
+            if let Change::WriteTableItem(table_item) = wsc.change.as_ref().unwrap()
+                && let Some(map) =
                     Self::get_inactive_share_to_pool_mapping(table_item, txn_version).unwrap()
-                {
-                    inactive_share_to_pool.extend(map);
-                }
+            {
+                inactive_share_to_pool.extend(map);
             }
         }
         // Now make a pass through table items to get the actual delegator balances

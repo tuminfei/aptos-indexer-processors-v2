@@ -1,3 +1,6 @@
+// Copyright (c) Aptos Foundation
+// Licensed pursuant to the Innovation-Enabling Source Code License, available at https://github.com/aptos-labs/aptos-core/blob/main/LICENSE
+
 use ahash::AHashMap;
 use aptos_indexer_processor_sdk::testing_framework::sdk_test_context::SdkTestContext;
 use processor::{
@@ -46,6 +49,7 @@ pub fn setup_token_v2_processor_config(
                 override_starting_version: transaction_stream_config.starting_version.unwrap(),
                 ending_version: transaction_stream_config.request_ending_version,
             }),
+            progress_health_config: None,
         },
         processor_name,
     )
@@ -58,7 +62,7 @@ mod sdk_token_v2_processor_tests {
     use crate::{
         diff_test_helper::token_v2_processor::load_data,
         sdk_tests::test_helpers::{
-            run_processor_test, setup_test_environment, validate_json, DEFAULT_OUTPUT_FOLDER,
+            DEFAULT_OUTPUT_FOLDER, run_processor_test, setup_test_environment, validate_json,
         },
     };
     use aptos_indexer_processor_sdk::testing_framework::{
@@ -68,21 +72,21 @@ mod sdk_token_v2_processor_tests {
         IMPORTED_DEVNET_TXNS_19922017_TOKEN_V1_OFFER_CLAIM,
         IMPORTED_DEVNET_TXNS_78753831_TOKEN_V1_MINT_TRANSFER_WITH_V2_EVENTS,
         IMPORTED_DEVNET_TXNS_78753832_TOKEN_V2_MINT_TRANSFER_WITH_V2_EVENTS,
-        IMPORTED_MAINNET_TXNS_1058723093_TOKEN_V1_MINT_WITHDRAW_DEPOSIT_EVENTS,
-        IMPORTED_MAINNET_TXNS_1080786089_TOKEN_V2_BURN_EVENT_V1,
         IMPORTED_MAINNET_TXNS_11648867_TOKEN_V1_BURN_EVENT,
+        IMPORTED_MAINNET_TXNS_84023785_TOKEN_V1_CLAIM_OFFER,
+        IMPORTED_MAINNET_TXNS_97963136_TOKEN_V1_CANCEL_OFFER,
         IMPORTED_MAINNET_TXNS_141135867_TOKEN_V1_OFFER,
         IMPORTED_MAINNET_TXNS_178179220_TOKEN_V1_MUTATE_EVENT,
-        IMPORTED_MAINNET_TXNS_3020266695_TOKEN_V1_OFFER_MODULE_EVENT,
         IMPORTED_MAINNET_TXNS_325355235_TOKEN_V2_UNLIMITED_SUPPLY_MINT,
         IMPORTED_MAINNET_TXNS_445585423_TOKEN_MINT_AND_BURN_EVENT,
         IMPORTED_MAINNET_TXNS_453498957_TOKEN_V2_MINT_AND_TRANSFER_EVENT_V1,
         IMPORTED_MAINNET_TXNS_537250181_TOKEN_V2_FIXED_SUPPLY_MINT,
         IMPORTED_MAINNET_TXNS_578366445_TOKEN_V2_BURN_EVENT_V2,
-        IMPORTED_MAINNET_TXNS_84023785_TOKEN_V1_CLAIM_OFFER,
         IMPORTED_MAINNET_TXNS_967255533_TOKEN_V2_MUTATION_EVENT,
-        IMPORTED_MAINNET_TXNS_97963136_TOKEN_V1_CANCEL_OFFER,
         IMPORTED_MAINNET_TXNS_999930475_TOKEN_V2_CONCURRENT_MINT,
+        IMPORTED_MAINNET_TXNS_1058723093_TOKEN_V1_MINT_WITHDRAW_DEPOSIT_EVENTS,
+        IMPORTED_MAINNET_TXNS_1080786089_TOKEN_V2_BURN_EVENT_V1,
+        IMPORTED_MAINNET_TXNS_3020266695_TOKEN_V1_OFFER_MODULE_EVENT,
     };
     use processor::processors::token_v2::token_v2_processor::TokenV2Processor;
 

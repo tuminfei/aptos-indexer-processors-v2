@@ -1,11 +1,12 @@
-// Copyright © Aptos Foundation
-// SPDX-License-Identifier: Apache-2.0
+// Copyright (c) Aptos Foundation
+// Licensed pursuant to the Innovation-Enabling Source Code License, available at https://github.com/aptos-labs/aptos-core/blob/main/LICENSE
 
 #![allow(clippy::extra_unused_lifetimes)]
 
 use crate::schema::backfill_processor_status;
 use aptos_indexer_processor_sdk::postgres::utils::database::DbPoolConnection;
 use diesel::{
+    AsChangeset, ExpressionMethods, Insertable, OptionalExtension, QueryDsl, Queryable,
     deserialize,
     deserialize::{FromSql, FromSqlRow},
     expression::AsExpression,
@@ -13,7 +14,6 @@ use diesel::{
     serialize,
     serialize::{IsNull, Output, ToSql},
     sql_types::Text,
-    AsChangeset, ExpressionMethods, Insertable, OptionalExtension, QueryDsl, Queryable,
 };
 use diesel_async::RunQueryDsl;
 use std::io::Write;

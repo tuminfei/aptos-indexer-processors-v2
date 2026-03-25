@@ -1,3 +1,6 @@
+// Copyright (c) Aptos Foundation
+// Licensed pursuant to the Innovation-Enabling Source Code License, available at https://github.com/aptos-labs/aptos-core/blob/main/LICENSE
+
 #[cfg(test)]
 pub mod account_restoration_processor_tests;
 #[cfg(test)]
@@ -6,6 +9,8 @@ pub mod account_transaction_processor_tests;
 pub mod ans_processor_tests;
 #[cfg(test)]
 pub mod default_processor_tests;
+#[cfg(all(test, feature = "failpoints"))]
+pub mod event_file_processor_tests;
 #[cfg(test)]
 pub mod fungible_asset_processor_tests;
 #[cfg(test)]
@@ -23,7 +28,7 @@ pub mod test_helpers {
     use aptos_indexer_processor_sdk::{
         testing_framework::{
             database::{PostgresTestDatabase, TestDatabase},
-            sdk_test_context::{remove_inserted_at, SdkTestContext},
+            sdk_test_context::{SdkTestContext, remove_inserted_at},
         },
         traits::processor_trait::ProcessorTrait,
     };

@@ -1,3 +1,6 @@
+// Copyright (c) Aptos Foundation
+// Licensed pursuant to the Innovation-Enabling Source Code License, available at https://github.com/aptos-labs/aptos-core/blob/main/LICENSE
+
 use crate::{
     config::{
         indexer_processor_config::IndexerProcessorConfig,
@@ -15,13 +18,13 @@ use aptos_indexer_processor_sdk::{
     postgres::{
         models::processor_status::{ProcessorStatus, ProcessorStatusQuery},
         processor_metadata_schema::processor_metadata::processor_status,
-        utils::database::{execute_with_better_error, ArcDbPool},
+        utils::database::{ArcDbPool, execute_with_better_error},
     },
     types::transaction_context::TransactionContext,
     utils::errors::ProcessorError,
 };
 use async_trait::async_trait;
-use diesel::{query_dsl::methods::FilterDsl, upsert::excluded, ExpressionMethods};
+use diesel::{ExpressionMethods, query_dsl::methods::FilterDsl, upsert::excluded};
 
 /// A trait implementation of ProcessorStatusSaver for Postgres.
 pub struct PostgresProcessorStatusSaver {
@@ -335,18 +338,18 @@ pub fn log_ascii_warning(version: u64) {
 mod tests {
     use super::*;
     use crate::{
+        MIGRATIONS,
         config::{
             db_config::{DbConfig, PostgresConfig},
             indexer_processor_config::IndexerProcessorConfig,
             processor_config::{DefaultProcessorConfig, ProcessorConfig},
         },
         db::backfill_processor_status::{BackfillProcessorStatus, BackfillStatus},
-        MIGRATIONS,
     };
     use ahash::AHashMap;
     use aptos_indexer_processor_sdk::{
         aptos_indexer_transaction_stream::{
-            utils::additional_headers::AdditionalHeaders, TransactionStreamConfig,
+            TransactionStreamConfig, utils::additional_headers::AdditionalHeaders,
         },
         postgres::{
             models::processor_status::ProcessorStatus,
@@ -382,16 +385,17 @@ mod tests {
                 indexer_grpc_data_service_address: Url::parse("https://test.com").unwrap(),
                 starting_version: None,
                 request_ending_version: None,
-                auth_token: "test".to_string(),
+                auth_token: Some("test".to_string()),
                 request_name_header: "test".to_string(),
                 indexer_grpc_http2_ping_interval_secs: 1,
                 indexer_grpc_http2_ping_timeout_secs: 1,
-                indexer_grpc_reconnection_timeout_secs: 1,
                 indexer_grpc_response_item_timeout_secs: 1,
-                indexer_grpc_reconnection_max_retries: 1,
+                reconnection_config: Default::default(),
                 additional_headers: AdditionalHeaders::default(),
                 transaction_filter: None,
+                backup_endpoints: vec![],
             },
+            progress_health_config: None,
         }
     }
 

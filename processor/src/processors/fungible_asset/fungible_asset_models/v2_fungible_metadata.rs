@@ -1,12 +1,12 @@
-// Copyright © Aptos Foundation
-// SPDX-License-Identifier: Apache-2.0
+// Copyright (c) Aptos Foundation
+// Licensed pursuant to the Innovation-Enabling Source Code License, available at https://github.com/aptos-labs/aptos-core/blob/main/LICENSE
 
 // This is required because a diesel macro makes clippy sad
 #![allow(clippy::extra_unused_lifetimes)]
 #![allow(clippy::unused_unit)]
 
 use crate::{
-    db::resources::{FromWriteResource, BURN_ADDR},
+    db::resources::{BURN_ADDR, FromWriteResource},
     parquet_processors::parquet_utils::util::{HasVersion, NamedTable},
     processors::{
         fungible_asset::{

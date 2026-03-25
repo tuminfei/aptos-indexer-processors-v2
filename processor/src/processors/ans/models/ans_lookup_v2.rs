@@ -1,5 +1,5 @@
-// Copyright © Aptos Foundation
-// SPDX-License-Identifier: Apache-2.0
+// Copyright (c) Aptos Foundation
+// Licensed pursuant to the Innovation-Enabling Source Code License, available at https://github.com/aptos-labs/aptos-core/blob/main/LICENSE
 
 // This is required because a diesel macro makes clippy sad
 #![allow(clippy::extra_unused_lifetimes)]
@@ -10,7 +10,7 @@ use crate::{
     processors::{
         ans::models::{
             ans_lookup::{AnsLookup, CurrentAnsLookup},
-            ans_utils::{get_token_name, NameRecordV2, SubdomainExtV2},
+            ans_utils::{NameRecordV2, SubdomainExtV2, get_token_name},
         },
         token_v2::token_v2_models::v2_token_utils::TokenStandard,
     },

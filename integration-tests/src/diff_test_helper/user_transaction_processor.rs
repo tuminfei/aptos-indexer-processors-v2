@@ -1,6 +1,9 @@
+// Copyright (c) Aptos Foundation
+// Licensed pursuant to the Innovation-Enabling Source Code License, available at https://github.com/aptos-labs/aptos-core/blob/main/LICENSE
+
 use crate::models::user_transaction_models::{Signature, UserTransaction};
 use anyhow::Result;
-use diesel::{pg::PgConnection, ExpressionMethods, QueryDsl, RunQueryDsl};
+use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, pg::PgConnection};
 use processor::schema::{signatures::dsl as sig_dsl, user_transactions::dsl as ut_dsl};
 use serde_json::Value;
 use std::collections::HashMap;

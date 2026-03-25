@@ -1,7 +1,10 @@
+// Copyright (c) Aptos Foundation
+// Licensed pursuant to the Innovation-Enabling Source Code License, available at https://github.com/aptos-labs/aptos-core/blob/main/LICENSE
+
 use crate::{
     parquet_processors::{
-        parquet_utils::util::add_to_map_if_opted_in_for_backfill, ParquetTypeEnum,
-        ParquetTypeStructs,
+        ParquetTypeEnum, ParquetTypeStructs,
+        parquet_utils::util::add_to_map_if_opted_in_for_backfill,
     },
     processors::stake::{
         models::{
@@ -15,7 +18,7 @@ use crate::{
 };
 use aptos_indexer_processor_sdk::{
     aptos_protos::transaction::v1::Transaction,
-    traits::{async_step::AsyncRunType, AsyncStep, NamedStep, Processable},
+    traits::{AsyncStep, NamedStep, Processable, async_step::AsyncRunType},
     types::transaction_context::TransactionContext,
     utils::errors::ProcessorError,
 };
