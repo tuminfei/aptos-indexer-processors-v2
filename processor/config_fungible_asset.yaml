@@ -13,4 +13,4 @@ server_config:
     initial_starting_version: 0
   db_config:
     type: postgres_config
-    connection_string: postgresql://aptos:aptos123@localhost:5432/topo_index_dev
+    connection_string: postgresql://aptos:aptos123@localhost:5432/topo_indexer_dev
