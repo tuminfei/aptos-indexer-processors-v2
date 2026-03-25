@@ -1,4 +1,4 @@
-# Config for fungible_asset_processor
+# This is a template config.yaml for a processor
 health_check_port: 8085
 server_config:
   processor_config:
@@ -9,8 +9,8 @@ server_config:
     auth_token: "AUTH_TOKEN"
     request_name_header: "fungible_asset_processor"
   processor_mode:
-    type: "default"
+    type: "default" # Default mode is used to bootstrap the processor from an initial starting version. For backfills, use backfill mode.
     initial_starting_version: 0
   db_config:
     type: postgres_config
-    connection_string: postgresql://aptos:aptos123@localhost:5432/topo_index_dev
+    connection_string: postgresql://curriculum_user:curriculum_dev_password@localhost:5432/topo_index_dev
