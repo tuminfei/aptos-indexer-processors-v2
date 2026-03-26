@@ -71,4 +71,35 @@ curl -X POST http://localhost:10000/v1/metadata \
 2. **数据库连接**：确保Hasura和processor使用的是同一个数据库
 3. **环境变量**：确保设置了所有必要的环境变量，特别是 `INDEXER_V2_POSTGRES_URL`
 
+## 更新配置后重启容器
+
+当您需要更新Hasura的配置（例如修改数据库连接字符串、添加新的环境变量等）时，请按照以下步骤操作：
+
+```bash
+# 1. 停止并移除当前容器
+docker stop hasura && docker rm hasura
+
+# 2. 使用新的配置重新启动容器
+docker run -d \
+  --name hasura \
+  --add-host=host.docker.internal:host-gateway \
+  -p 10000:8080 \
+  -e HASURA_GRAPHQL_DATABASE_URL=postgresql://postgres:@host.docker.internal:5433/indexer_v2 \
+  -e INDEXER_V2_POSTGRES_URL=postgresql://postgres:@host.docker.internal:5433/indexer_v2 \
+  -e HASURA_GRAPHQL_ENABLE_CONSOLE=true \
+  -e HASURA_GRAPHQL_DEV_MODE=true \
+  # 添加其他需要的环境变量
+  hasura/graphql-engine:latest
+
+# 3. 重新加载元数据
+cd /Users/tuminfei/Documents/Code/Rust/aptos-indexer-processors-v2/hasura-api
+
+curl -X POST http://localhost:10000/v1/metadata \
+  -H "Content-Type: application/json" \
+  -d "{
+    \"type\": \"replace_metadata\",
+    \"args\": $(cat metadata-json/unified.json)
+  }"
+```
+
 通过以上步骤，您应该能够成功加载元数据并开始使用Hasura的GraphQL API来查询processor索引的数据。
