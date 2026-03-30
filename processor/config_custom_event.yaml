@@ -1,22 +1,20 @@
 # Custom Event Processor Configuration
 health_check_port: 9080
-processor_config:
-  type: custom_event_processor
-  channel_size: 100
-  tables_to_write: ["custom_events"]
-
-processor_mode:
-  type: default
-  initial_starting_version: 0
-
-transaction_stream_config:
-  indexer_grpc_data_service_address: "http://127.0.0.1:50051"
-  auth_token: "AUTH_TOKEN"
-  request_name_header: "custom_event_processor"
-  batch_size: 100
-  polling_interval_ms: 1000
-  max_retries: 5
-
-db_config:
-  type: postgres_config
-  connection_string: "postgresql://aptos:aptos123@localhost:5432/topo_indexer_dev"
+server_config:
+  processor_config:
+    type: custom_event_processor
+    channel_size: 100
+    tables_to_write: ["custom_events"]
+  processor_mode:
+    type: default
+    initial_starting_version: 0
+  transaction_stream_config:
+    indexer_grpc_data_service_address: "http://127.0.0.1:50051"
+    auth_token: "AUTH_TOKEN"
+    request_name_header: "custom_event_processor"
+    batch_size: 100
+    polling_interval_ms: 1000
+    max_retries: 5
+  db_config:
+    type: postgres_config
+    connection_string: "postgresql://aptos:aptos123@localhost:5432/topo_indexer_dev"
