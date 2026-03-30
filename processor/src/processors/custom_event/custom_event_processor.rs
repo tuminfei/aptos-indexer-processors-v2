@@ -1,16 +1,38 @@
 // Copyright (c) Aptos Foundation
 // Licensed pursuant to the Innovation-Enabling Source Code License, available at https://github.com/aptos-labs/aptos-core/blob/main/LICENSE
 
-use crate::config::{ProcessorConfig, DefaultProcessorConfig, db_config::DbConfig};
-use crate::db::resources::ArcDbPool;
-use crate::processors::custom_event::{custom_event_extractor::CustomEventExtractor, custom_event_storer::CustomEventStorer};
-use crate::processors::ProcessorTrait;
-use crate::utils::database::TableFlags;
-use crate::utils::streaming::{ProcessorBuilder, TransactionStreamConfig, TransactionStreamStep, VersionTrackerStep};
-use crate::utils::{DbTooling, get_starting_version, get_end_version, run_migrations, check_or_update_chain_id};
-use crate::{MIGRATIONS, processors::processor_status_saver::PostgresChainIdChecker};
+use crate::{
+    MIGRATIONS,
+    config::{
+        db_config::DbConfig,
+        indexer_processor_config::IndexerProcessorConfig,
+        processor_config::ProcessorConfig,
+    },
+    processors::{
+        custom_event::{
+            custom_event_extractor::CustomEventExtractor, custom_event_storer::CustomEventStorer,
+        },
+        processor_status_saver::{
+            PostgresProcessorStatusSaver, get_end_version, get_starting_version,
+        },
+    },
+    utils::table_flags::TableFlags,
+};
 use anyhow::Result;
-use async_trait::async_trait;
+use aptos_indexer_processor_sdk::{
+    aptos_indexer_transaction_stream::TransactionStreamConfig,
+    builder::ProcessorBuilder,
+    common_steps::{
+        DEFAULT_UPDATE_PROCESSOR_STATUS_SECS, TransactionStreamStep, VersionTrackerStep,
+    },
+    postgres::utils::{
+        checkpoint::PostgresChainIdChecker,
+        database::{ArcDbPool, run_migrations},
+    },
+    traits::{processor_trait::ProcessorTrait, IntoRunnableStep},
+    utils::chain_id_check::check_or_update_chain_id,
+};
+use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct CustomEventProcessorConfig {
@@ -20,17 +42,36 @@ pub struct CustomEventProcessorConfig {
 }
 
 pub struct CustomEventProcessor {
-    config: crate::config::IndexerProcessorConfig,
+    config: IndexerProcessorConfig,
     db_pool: ArcDbPool,
 }
 
 impl CustomEventProcessor {
-    pub async fn new(config: crate::config::IndexerProcessorConfig) -> Result<Self> {
-        let db_tooling = DbTooling::new(&config.db_config).await?;
-        Ok(Self {
-            config,
-            db_pool: db_tooling.db_pool,
-        })
+    pub async fn new(config: IndexerProcessorConfig) -> Result<Self> {
+        match config.db_config {
+            DbConfig::PostgresConfig(ref postgres_config) => {
+                let conn_pool = aptos_indexer_processor_sdk::postgres::utils::database::new_db_pool(
+                    &postgres_config.connection_string,
+                    Some(postgres_config.db_pool_size),
+                )
+                .await
+                .map_err(|e| {
+                    anyhow::anyhow!(
+                        "Failed to create connection pool for PostgresConfig: {:?}",
+                        e
+                    )
+                })?;
+
+                Ok(Self {
+                    config,
+                    db_pool: conn_pool,
+                })
+            },
+            _ => Err(anyhow::anyhow!(
+                "Invalid db config for CustomEventProcessor {:?}",
+                config.db_config
+            )),
+        }
     }
 }
 
@@ -70,13 +111,21 @@ impl ProcessorTrait for CustomEventProcessor {
         };
 
         let channel_size = processor_config.channel_size;
-        let table_flags = TableFlags::from_set(&processor_config.tables_to_write.unwrap_or_default().into_iter().collect());
+        let table_flags = TableFlags::from_set(
+            &processor_config
+                .tables_to_write
+                .clone()
+                .unwrap_or_default()
+                .into_iter()
+                .collect(),
+        );
 
         let transaction_stream = TransactionStreamStep::new(TransactionStreamConfig {
             starting_version,
             request_ending_version: ending_version,
             ..self.config.transaction_stream_config.clone()
-        }).await?;
+        })
+        .await?;
 
         let custom_extractor = CustomEventExtractor::new();
         let custom_storer = CustomEventStorer::new(
@@ -86,17 +135,34 @@ impl ProcessorTrait for CustomEventProcessor {
         );
 
         let version_tracker = VersionTrackerStep::new(
-            crate::utils::streaming::PostgresProcessorStatusSaver::new(self.config.clone(), self.db_pool.clone()),
-            crate::utils::streaming::DEFAULT_UPDATE_PROCESSOR_STATUS_SECS,
+            PostgresProcessorStatusSaver::new(self.config.clone(), self.db_pool.clone()),
+            DEFAULT_UPDATE_PROCESSOR_STATUS_SECS,
         );
 
-        ProcessorBuilder::new_with_inputless_first_step(
+        // Connect processor steps together
+        let (_, buffer_receiver) = ProcessorBuilder::new_with_inputless_first_step(
             transaction_stream.into_runnable_step(),
         )
         .connect_to(custom_extractor.into_runnable_step(), channel_size)
         .connect_to(custom_storer.into_runnable_step(), channel_size)
         .connect_to(version_tracker.into_runnable_step(), channel_size)
-        .run()
-        .await
+        .end_and_return_output_receiver(channel_size);
+
+        // (Optional) Parse the results
+        loop {
+            match buffer_receiver.recv().await {
+                Ok(txn_context) => {
+                    tracing::debug!(
+                        "Finished processing versions [{:?}, {:?}]",
+                        txn_context.metadata.start_version,
+                        txn_context.metadata.end_version,
+                    );
+                },
+                Err(e) => {
+                    tracing::info!("No more transactions in channel: {:?}", e);
+                    break Ok(());
+                },
+            }
+        }
     }
 }

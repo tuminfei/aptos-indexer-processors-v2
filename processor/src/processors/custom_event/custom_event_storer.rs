@@ -1,16 +1,24 @@
 // Copyright (c) Aptos Foundation
 // Licensed pursuant to the Innovation-Enabling Source Code License, available at https://github.com/aptos-labs/aptos-core/blob/main/LICENSE
 
-use crate::db::resources::ArcDbPool;
-use crate::processors::custom_event::custom_event_models::custom_events::NewCustomEvent;
 use crate::processors::custom_event::custom_event_extractor::CustomEventData;
+use crate::processors::custom_event::custom_event_models::custom_events::NewCustomEvent;
 use crate::processors::custom_event::custom_event_processor::CustomEventProcessorConfig;
-use crate::utils::database::TableFlags;
-use crate::utils::streaming::{AsyncStep, AsyncRunType, TransactionContext};
-use anyhow::Result;
-use diesel::prelude::*;
+use crate::schema;
+use crate::utils::table_flags::TableFlags;
+use aptos_indexer_processor_sdk::{
+    postgres::utils::database::{ArcDbPool, execute_in_chunks, get_config_table_chunk_size},
+    traits::{AsyncStep, NamedStep, Processable, async_step::AsyncRunType},
+    types::transaction_context::TransactionContext,
+    utils::errors::ProcessorError,
+};
+use diesel::pg::Pg;
+use diesel::query_builder::QueryFragment;
 
-pub struct CustomEventStorer {
+pub struct CustomEventStorer
+where
+    Self: Sized + Send + 'static,
+{
     conn_pool: ArcDbPool,
     processor_config: CustomEventProcessorConfig,
     table_flags: TableFlags,
@@ -28,47 +36,62 @@ impl CustomEventStorer {
             table_flags,
         }
     }
-
-    async fn store_custom_events(&self, events: &[NewCustomEvent]) -> Result<()> {
-        if events.is_empty() {
-            return Ok(());
-        }
-
-        let chunk_size = *self.processor_config.per_table_chunk_sizes.get("custom_events").unwrap_or(&32768);
-        let chunks = events.chunks(chunk_size);
-
-        for chunk in chunks {
-            let conn = self.conn_pool.get()?;
-            diesel::insert_into(crate::db::schema::custom_events::table)
-                .values(chunk)
-                .on_conflict((crate::db::schema::custom_events::transaction_version, crate::db::schema::custom_events::event_index))
-                .do_nothing()
-                .execute(&conn)?;
-        }
-
-        Ok(())
-    }
 }
 
 #[async_trait::async_trait]
-impl AsyncStep for CustomEventStorer {
-    type Input = TransactionContext<CustomEventData>;
-    type Output = TransactionContext<()>;
+impl Processable for CustomEventStorer {
+    type Input = CustomEventData;
+    type Output = ();
     type RunType = AsyncRunType;
 
     async fn process(
         &mut self,
         input: TransactionContext<CustomEventData>,
-    ) -> Result<Option<TransactionContext<()>>, crate::processors::ProcessorError> {
-        let CustomEventData { events } = input.data;
+    ) -> Result<Option<TransactionContext<()>>, ProcessorError> {
+        let events = &input.data.events;
 
-        if !events.is_empty() && self.table_flags.should_write("custom_events") {
-            self.store_custom_events(&events).await?;
+        if !events.is_empty() && self.table_flags.contains(TableFlags::CUSTOM_EVENTS) {
+            let per_table_chunk_sizes = self.processor_config.per_table_chunk_sizes.clone();
+            
+            execute_in_chunks(
+                self.conn_pool.clone(),
+                insert_custom_events_query,
+                events,
+                get_config_table_chunk_size::<NewCustomEvent>(
+                    "custom_events",
+                    &per_table_chunk_sizes,
+                ),
+            ).await.map_err(|e| ProcessorError::DBStoreError {
+                message: format!(
+                    "Failed to store versions {} to {}: {:?}",
+                    input.metadata.start_version, input.metadata.end_version, e,
+                ),
+                query: None,
+            })?;
         }
 
         Ok(Some(TransactionContext {
             data: (),
-            ..input
+            metadata: input.metadata,
         }))
     }
+}
+
+impl AsyncStep for CustomEventStorer {}
+
+impl NamedStep for CustomEventStorer {
+    fn name(&self) -> String {
+        "CustomEventStorer".to_string()
+    }
+}
+
+pub fn insert_custom_events_query(
+    items_to_insert: Vec<NewCustomEvent>,
+) -> impl QueryFragment<Pg> + diesel::query_builder::QueryId + Send {
+    use schema::custom_events::dsl::*;
+
+    diesel::insert_into(schema::custom_events::table)
+        .values(items_to_insert)
+        .on_conflict((transaction_version, event_index))
+        .do_nothing()
 }

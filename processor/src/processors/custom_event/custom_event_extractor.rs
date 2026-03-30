@@ -2,13 +2,15 @@
 // Licensed pursuant to the Innovation-Enabling Source Code License, available at https://github.com/aptos-labs/aptos-core/blob/main/LICENSE
 
 use crate::processors::custom_event::custom_event_models::custom_events::NewCustomEvent;
-use crate::utils::streaming::{AsyncStep, AsyncRunType, TransactionContext};
 use anyhow::Result;
-use aptos_indexer_grpc_client::aptos::transaction::v1::{
-    transaction::TxnData, Transaction,
-};
-use aptos_indexer_processor_sdk::utils::{
-    convert::standardize_address, extract::get_entry_function_from_user_request,
+use aptos_indexer_processor_sdk::{
+    aptos_protos::transaction::v1::{transaction::TxnData, Transaction},
+    traits::{AsyncStep, NamedStep, Processable, async_step::AsyncRunType},
+    types::transaction_context::TransactionContext,
+    utils::{
+        convert::standardize_address, errors::ProcessorError,
+        extract::get_entry_function_from_user_request,
+    },
 };
 use chrono::NaiveDateTime;
 use serde_json::Value;
@@ -28,16 +30,16 @@ pub struct CustomEventData {
 const MY_COINS_ADDRESS: &str = "0x0c0084b96923d3281d39c5a6561ac957fb9af07cc65132fc8806a89ec071b28b";
 
 #[async_trait::async_trait]
-impl AsyncStep for CustomEventExtractor {
-    type Input = TransactionContext<Vec<Transaction>>;
-    type Output = TransactionContext<CustomEventData>;
+impl Processable for CustomEventExtractor {
+    type Input = Vec<Transaction>;
+    type Output = CustomEventData;
     type RunType = AsyncRunType;
 
     async fn process(
         &mut self,
         input: TransactionContext<Vec<Transaction>>,
-    ) -> Result<Option<TransactionContext<CustomEventData>>, crate::processors::ProcessorError> {
-        let transactions = input.data;
+    ) -> Result<Option<TransactionContext<CustomEventData>>, ProcessorError> {
+        let transactions = &input.data;
         let mut events = vec![];
 
         for txn in transactions {
@@ -78,7 +80,7 @@ impl AsyncStep for CustomEventExtractor {
 
                             let new_event = NewCustomEvent {
                                 transaction_version,
-                                event_index: 0, // Since we're using entry function, index is 0 or we can use another value
+                                event_index: 0, // Since we're using entry function, index is 0
                                 account_address: standardize_address(&user_request.sender),
                                 event_type: format!("{}::mint", module),
                                 event_data,
@@ -91,14 +93,12 @@ impl AsyncStep for CustomEventExtractor {
                 }
                 
                 // We can also look at actual events if we prefer
-                for (event_index, event) in user_txn.events.iter().enumerate() {
+                for (_event_index, event) in user_txn.events.iter().enumerate() {
                     let event_type = &event.type_str;
                     
                     // Standard MintEvent is 0x1::coin::MintEvent
                     if event_type == "0x1::coin::MintEvent" {
                         // Here we could perform extra checks if we had the mapping
-                        // But for now, if it's in a txn that called our mint, we'll get it above or here.
-                        // Let's also include these if they are in the same transaction
                     }
                 }
             }
@@ -106,7 +106,15 @@ impl AsyncStep for CustomEventExtractor {
 
         Ok(Some(TransactionContext {
             data: CustomEventData { events },
-            ..input
+            metadata: input.metadata,
         }))
+    }
+}
+
+impl AsyncStep for CustomEventExtractor {}
+
+impl NamedStep for CustomEventExtractor {
+    fn name(&self) -> String {
+        "CustomEventExtractor".to_string()
     }
 }

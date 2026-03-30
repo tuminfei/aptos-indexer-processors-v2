@@ -84,6 +84,7 @@ bitflags! {
         const AUTH_KEY_ACCOUNT_ADDRESSES = 1 << 111;
         const PUBLIC_KEY_AUTH_KEYS = 1 << 112;
         const GAS_FEES = 1 << 123;
+        const CUSTOM_EVENTS = 1 << 124;
     }
 }
 
