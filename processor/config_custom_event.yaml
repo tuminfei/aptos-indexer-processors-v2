@@ -2,17 +2,16 @@
 
 processor_config:
   type: custom_event_processor
-  channel_size: 1000
+  channel_size: 100
   tables_to_write: ["custom_events"]
-  per_table_chunk_sizes:
-    custom_events: 32768
 
 processor_mode:
   type: default
   initial_starting_version: 0
 
 transaction_stream_config:
-  indexer_grpc_data_service_address: "https://grpc.aptos.mainnet.prod.aptos.dev"
+  indexer_grpc_data_service_address: "http://127.0.0.1:50051"
+  auth_token: "AUTH_TOKEN"
   request_name_header: "custom_event_processor"
   batch_size: 100
   polling_interval_ms: 1000
@@ -20,13 +19,4 @@ transaction_stream_config:
 
 db_config:
   type: postgres_config
-  connection_string: "postgresql://user:password@localhost:5432/aptos_indexer"
-
-server_config:
-  port: 8080
-  address: "0.0.0.0"
-  health_check_port: 8081
-  progress_health_config:
-    enabled: true
-    max_time_since_last_update_secs: 300
-    check_interval_secs: 30
+  connection_string: "postgresql://aptos:aptos123@localhost:5432/topo_indexer_dev"
