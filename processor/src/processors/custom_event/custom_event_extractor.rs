@@ -4,12 +4,10 @@
 use crate::processors::custom_event::custom_event_models::custom_events::NewCustomEvent;
 use anyhow::Result;
 use aptos_indexer_processor_sdk::{
-    aptos_protos::transaction::v1::{transaction::TxnData, Transaction},
+    aptos_protos::transaction::v1::{Transaction, transaction::TxnData},
     traits::{AsyncStep, NamedStep, Processable, async_step::AsyncRunType},
     types::transaction_context::TransactionContext,
-    utils::{
-        convert::standardize_address, errors::ProcessorError,
-    },
+    utils::{convert::standardize_address, errors::ProcessorError},
 };
 use chrono::NaiveDateTime;
 use serde_json::Value;
@@ -58,20 +56,39 @@ impl Processable for CustomEventExtractor {
             let timestamp = NaiveDateTime::from_timestamp_opt(timestamp.seconds, 0)
                 .expect("Txn Timestamp is invalid!");
 
-            let txn_data = txn.txn_data.as_ref().expect("Transaction data doesn't exist");
-            
+            let txn_data = txn
+                .txn_data
+                .as_ref()
+                .expect("Transaction data doesn't exist");
+
             if let TxnData::User(user_txn) = txn_data {
                 // Focus on 0x1::fungible_asset::Deposit events
                 for (event_index, event) in user_txn.events.iter().enumerate() {
                     let event_type = &event.type_str;
-                    
+
+                    tracing::debug!(
+                        transaction_version = transaction_version,
+                        event_index = event_index,
+                        event_type = event_type,
+                        "[Custom Event] Checking event"
+                    );
+
                     if event_type == "0x1::fungible_asset::Deposit" {
                         let event_data = serde_json::to_value(&event.data).unwrap_or(Value::Null);
+                        let account_address =
+                            standardize_address(&event.key.as_ref().unwrap().account_address);
+
+                        tracing::info!(
+                            transaction_version = transaction_version,
+                            event_index = event_index,
+                            account_address = account_address,
+                            "[Custom Event] Found 0x1::fungible_asset::Deposit event"
+                        );
 
                         let new_event = NewCustomEvent {
                             transaction_version,
                             event_index: event_index as i64,
-                            account_address: standardize_address(&event.key.as_ref().unwrap().account_address),
+                            account_address,
                             event_type: event_type.clone(),
                             event_data,
                             transaction_timestamp: timestamp,
@@ -81,6 +98,14 @@ impl Processable for CustomEventExtractor {
                     }
                 }
             }
+        }
+
+        if !events.is_empty() {
+            tracing::info!(
+                num_events = events.len(),
+                "[Custom Event] Extracted {} events from batch",
+                events.len()
+            );
         }
 
         Ok(Some(TransactionContext {
