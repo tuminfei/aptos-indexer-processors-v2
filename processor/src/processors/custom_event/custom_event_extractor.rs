@@ -66,12 +66,12 @@ impl Processable for CustomEventExtractor {
                 for (event_index, event) in user_txn.events.iter().enumerate() {
                     let event_type = &event.type_str;
 
-                    tracing::debug!(
-                        transaction_version = transaction_version,
-                        event_index = event_index,
-                        event_type = event_type,
-                        "[Custom Event] Checking event"
-                    );
+                    // tracing::debug!(
+                    //     transaction_version = transaction_version,
+                    //     event_index = event_index,
+                    //     event_type = event_type,
+                    //     "[Custom Event] Checking event"
+                    // );
 
                     if event_type == "0x1::fungible_asset::Deposit" {
                         let event_data = serde_json::to_value(&event.data).unwrap_or(Value::Null);
