@@ -71,7 +71,7 @@ impl Processable for CustomEventExtractor {
                         let new_event = NewCustomEvent {
                             transaction_version,
                             event_index: event_index as i64,
-                            account_address: standardize_address(&event.guid.as_ref().unwrap().account_address),
+                            account_address: standardize_address(&event.key.as_ref().unwrap().account_address),
                             event_type: event_type.clone(),
                             event_data,
                             transaction_timestamp: timestamp,
