@@ -14,9 +14,6 @@ server_config:
     indexer_grpc_data_service_address: "http://127.0.0.1:50051"
     auth_token: "AUTH_TOKEN"
     request_name_header: "custom_event_processor"
-    batch_size: 100
-    polling_interval_ms: 1000
-    max_retries: 5
   db_config:
     type: postgres_config
     connection_string: "postgresql://aptos:aptos123@localhost:5432/topo_indexer_dev"
