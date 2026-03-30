@@ -94,6 +94,10 @@ impl TableFlags {
         for table in set {
             if let Some(flag) = TableFlags::from_name(table) {
                 flags |= flag;
+            } else if let Some(flag) = TableFlags::from_name(&table.to_uppercase()) {
+                flags |= flag;
+            } else {
+                tracing::warn!("Unknown table name in flags: {}", table);
             }
         }
         flags

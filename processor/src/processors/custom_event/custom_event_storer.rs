@@ -50,7 +50,7 @@ impl Processable for CustomEventStorer {
     ) -> Result<Option<TransactionContext<()>>, ProcessorError> {
         let events = &input.data.events;
 
-        if !events.is_empty() && self.table_flags.contains(TableFlags::CUSTOM_EVENTS) {
+        if (!events.is_empty()) && (self.table_flags.is_empty() || self.table_flags.contains(TableFlags::CUSTOM_EVENTS)) {
             let per_table_chunk_sizes = self.processor_config.per_table_chunk_sizes.clone();
             
             execute_in_chunks(
