@@ -1,5 +1,5 @@
 # Custom Event Processor Configuration
-
+health_check_port: 9080
 processor_config:
   type: custom_event_processor
   channel_size: 100
