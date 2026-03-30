@@ -9,7 +9,6 @@ use aptos_indexer_processor_sdk::{
     types::transaction_context::TransactionContext,
     utils::{
         convert::standardize_address, errors::ProcessorError,
-        extract::get_entry_function_from_user_request,
     },
 };
 use chrono::NaiveDateTime;
@@ -27,8 +26,6 @@ pub struct CustomEventData {
     pub events: Vec<NewCustomEvent>,
 }
 
-const MY_COINS_ADDRESS: &str = "0x0c0084b96923d3281d39c5a6561ac957fb9af07cc65132fc8806a89ec071b28b";
-
 #[async_trait::async_trait]
 impl Processable for CustomEventExtractor {
     type Input = Vec<Transaction>;
@@ -42,6 +39,15 @@ impl Processable for CustomEventExtractor {
         let transactions = &input.data;
         let mut events = vec![];
 
+        // Output current block info for monitoring
+        tracing::info!(
+            start_version = input.metadata.start_version,
+            end_version = input.metadata.end_version,
+            num_transactions = transactions.len(),
+            "[Custom Event] Processing batch from version {}",
+            input.metadata.start_version
+        );
+
         for txn in transactions {
             let transaction_version = txn.version as i64;
             let timestamp = txn
@@ -54,51 +60,24 @@ impl Processable for CustomEventExtractor {
 
             let txn_data = txn.txn_data.as_ref().expect("Transaction data doesn't exist");
             
-            // We only care about User transactions for minting
             if let TxnData::User(user_txn) = txn_data {
-                let user_request = user_txn
-                    .request
-                    .as_ref()
-                    .expect("Request is not present in user txn");
-                
-                let entry_function_id_str = get_entry_function_from_user_request(user_request);
-                
-                if let Some(ef_id) = entry_function_id_str {
-                    // Check if it's one of MyCoins mint functions
-                    // ef_id format is "address::module::function"
-                    let parts: Vec<&str> = ef_id.split("::").collect();
-                    if parts.len() == 3 {
-                        let addr = standardize_address(parts[0]);
-                        let module = parts[1];
-                        let function = parts[2];
-                        
-                        let my_coins_addr = standardize_address(MY_COINS_ADDRESS);
-                        
-                        if addr == my_coins_addr && function == "mint" && (module == "bird_coin" || module == "cat_coin" || module == "dog_coin") {
-                            // This is a MyCoin mint!
-                            let event_data = serde_json::to_value(user_request).unwrap_or(Value::Null);
-
-                            let new_event = NewCustomEvent {
-                                transaction_version,
-                                event_index: 0, // Since we're using entry function, index is 0
-                                account_address: standardize_address(&user_request.sender),
-                                event_type: format!("{}::mint", module),
-                                event_data,
-                                transaction_timestamp: timestamp,
-                            };
-
-                            events.push(new_event);
-                        }
-                    }
-                }
-                
-                // We can also look at actual events if we prefer
-                for (_event_index, event) in user_txn.events.iter().enumerate() {
+                // Focus on 0x1::fungible_asset::Deposit events
+                for (event_index, event) in user_txn.events.iter().enumerate() {
                     let event_type = &event.type_str;
                     
-                    // Standard MintEvent is 0x1::coin::MintEvent
-                    if event_type == "0x1::coin::MintEvent" {
-                        // Here we could perform extra checks if we had the mapping
+                    if event_type == "0x1::fungible_asset::Deposit" {
+                        let event_data = serde_json::to_value(&event.data).unwrap_or(Value::Null);
+
+                        let new_event = NewCustomEvent {
+                            transaction_version,
+                            event_index: event_index as i64,
+                            account_address: standardize_address(&event.guid.as_ref().unwrap().account_address),
+                            event_type: event_type.clone(),
+                            event_data,
+                            transaction_timestamp: timestamp,
+                        };
+
+                        events.push(new_event);
                     }
                 }
             }
