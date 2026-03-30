@@ -4,7 +4,6 @@ server_config:
   processor_config:
     type: custom_event_processor
     channel_size: 100
-    tables_to_write: ["custom_events"]
   processor_mode:
     type: default
     initial_starting_version: 0
