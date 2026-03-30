@@ -10,6 +10,19 @@ diesel::table! {
 }
 
 diesel::table! {
+    custom_events (transaction_version, event_index) {
+        transaction_version -> Int8,
+        event_index -> Int8,
+        #[max_length = 66]
+        account_address -> Varchar,
+        event_type -> Text,
+        event_data -> Jsonb,
+        transaction_timestamp -> Timestamp,
+        inserted_at -> Timestamp,
+    }
+}
+
+diesel::table! {
     ans_lookup_v2 (transaction_version, write_set_change_index) {
         transaction_version -> Int8,
         write_set_change_index -> Int8,
@@ -941,6 +954,7 @@ diesel::table! {
 
 diesel::allow_tables_to_appear_in_same_query!(
     account_transactions,
+    custom_events,
     ans_lookup_v2,
     ans_primary_name_v2,
     auth_key_account_addresses,

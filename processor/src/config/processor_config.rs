@@ -59,6 +59,7 @@ use crate::{
             token_v2_processor::TokenV2ProcessorConfig,
         },
         user_transaction::models::user_transactions::ParquetUserTransaction,
+        custom_event::custom_event_processor::CustomEventProcessorConfig,
     },
 };
 use ahash::AHashMap;
@@ -110,6 +111,7 @@ pub enum ProcessorConfig {
     ObjectsProcessor(ObjectsProcessorConfig),
     MonitoringProcessor(DefaultProcessorConfig),
     GasFeeProcessor(DefaultProcessorConfig),
+    CustomEventProcessor(CustomEventProcessorConfig),
     // Event file processor (GCS-based, no DB)
     EventFileProcessor(EventFileProcessorConfig),
     // ParquetProcessor

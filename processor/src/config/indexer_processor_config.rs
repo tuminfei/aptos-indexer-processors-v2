@@ -28,6 +28,7 @@ use crate::{
         objects::objects_processor::ObjectsProcessor, stake::stake_processor::StakeProcessor,
         token_v2::token_v2_processor::TokenV2Processor,
         user_transaction::user_transaction_processor::UserTransactionProcessor,
+        custom_event::custom_event_processor::CustomEventProcessor,
     },
 };
 use anyhow::Result;
@@ -154,6 +155,10 @@ impl RunnableConfig for IndexerProcessorConfig {
             ProcessorConfig::ParquetObjectsProcessor(_) => {
                 let parquet_objects_processor = ParquetObjectsProcessor::new(self.clone()).await?;
                 parquet_objects_processor.run_processor().await
+            },
+            ProcessorConfig::CustomEventProcessor(_) => {
+                let custom_event_processor = CustomEventProcessor::new(self.clone()).await?;
+                custom_event_processor.run_processor().await
             },
         }
     }
