@@ -28,12 +28,19 @@ nohup ./target/release/processor -c ./processor/config_default.yaml > default_pr
 DEFAULT_PID=$!
 echo "default_processor started with PID: $DEFAULT_PID"
 
+# 运行 custom_event_processor
+echo "Starting custom_event_processor..."
+nohup ./target/release/processor -c ./processor/config_custom_event.yaml > custom_event_processor.log 2>&1 &
+CUSTOM_EVENT_PID=$!
+echo "custom_event_processor started with PID: $CUSTOM_EVENT_PID"
+
 echo "All processors started successfully!"
 echo "PIDs:"
 echo "fungible_asset_processor: $FUNGIBLE_PID"
 echo "user_transaction_processor: $USER_TXN_PID"
 echo "account_transactions_processor: $ACCOUNT_TXN_PID"
 echo "default_processor: $DEFAULT_PID"
+echo "custom_event_processor: $CUSTOM_EVENT_PID"
 echo ""
 echo "To check logs, use: tail -f *.log"
 echo "To stop a processor, use: kill <PID>"

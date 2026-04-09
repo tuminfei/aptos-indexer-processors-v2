@@ -12,6 +12,12 @@ use aptos_indexer_processor_sdk::{
 use chrono::NaiveDateTime;
 use serde_json::Value;
 
+// =============== 配置：需要监听的事件目标 ===============
+pub const TARGET_EVENT_TYPES: &[&str] = &[
+    "0x1::fungible_asset::Deposit",
+    "0xbfe262acf85005487af8911dc00d3587178c26bd0ff5443a89614da5f823028d::poc_contribution::ContributionEvent",
+];
+
 pub struct CustomEventExtractor;
 
 impl CustomEventExtractor {
@@ -62,7 +68,7 @@ impl Processable for CustomEventExtractor {
                 .expect("Transaction data doesn't exist");
 
             if let TxnData::User(user_txn) = txn_data {
-                // Focus on 0x1::fungible_asset::Deposit events
+                // Focus on 0x1::fungible_asset::Deposit and poc_framework::poc_contribution::ContributionEvent events
                 for (event_index, event) in user_txn.events.iter().enumerate() {
                     let event_type = &event.type_str;
 
@@ -73,7 +79,7 @@ impl Processable for CustomEventExtractor {
                     //     "[Custom Event] Checking event"
                     // );
 
-                    if event_type == "0x1::fungible_asset::Deposit" {
+                    if TARGET_EVENT_TYPES.contains(&event_type.as_str()) {
                         let event_data = serde_json::to_value(&event.data).unwrap_or(Value::Null);
                         let account_address =
                             standardize_address(&event.key.as_ref().unwrap().account_address);
@@ -81,8 +87,9 @@ impl Processable for CustomEventExtractor {
                         tracing::info!(
                             transaction_version = transaction_version,
                             event_index = event_index,
+                            event_type = event_type,
                             account_address = account_address,
-                            "[Custom Event] Found 0x1::fungible_asset::Deposit event"
+                            "[Custom Event] Found target event"
                         );
 
                         let new_event = NewCustomEvent {
