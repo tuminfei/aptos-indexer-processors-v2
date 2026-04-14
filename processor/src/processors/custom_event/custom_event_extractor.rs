@@ -13,20 +13,31 @@ use chrono::NaiveDateTime;
 use serde_json::Value;
 
 // =============== 配置：需要监听的事件目标 ===============
+macro_rules! poc_address {
+    () => {
+        "0xc2a4cf3e193ab576ab94e1b6d03d3667864184676d1f65d6717391e3d091ec41"
+    };
+}
+
+pub const POC_FRAMEWORK_ADDRESS: &str = poc_address!();
+
 pub const TARGET_EVENT_TYPES: &[&str] = &[
     "0x1::fungible_asset::Deposit",
     // POC contribution events
-    "0xbfe262acf85005487af8911dc00d3587178c26bd0ff5443a89614da5f823028d::poc_contribution::ContributionEvent",
+    concat!(poc_address!(), "::poc_contribution::ContributionEvent"),
     // POC power store events
-    "0xbfe262acf85005487af8911dc00d3587178c26bd0ff5443a89614da5f823028d::poc_power_store::OperatorChangedEvent",
-    "0xbfe262acf85005487af8911dc00d3587178c26bd0ff5443a89614da5f823028d::poc_power_store::PowerUpdatedEvent",
+    concat!(poc_address!(), "::poc_power_store::OperatorChangedEvent"),
+    concat!(poc_address!(), "::poc_power_store::PowerUpdatedEvent"),
     // POC registry events
-    "0xbfe262acf85005487af8911dc00d3587178c26bd0ff5443a89614da5f823028d::poc_registry::AppRegisteredEvent",
-    "0xbfe262acf85005487af8911dc00d3587178c26bd0ff5443a89614da5f823028d::poc_registry::AppAddressUpdatedEvent",
-    "0xbfe262acf85005487af8911dc00d3587178c26bd0ff5443a89614da5f823028d::poc_registry::AppEquityTokenUpdatedEvent",
-    "0xbfe262acf85005487af8911dc00d3587178c26bd0ff5443a89614da5f823028d::poc_registry::AppCustodyUpdatedEvent",
-    "0xbfe262acf85005487af8911dc00d3587178c26bd0ff5443a89614da5f823028d::poc_registry::AppStateChangedEvent",
-    "0xbfe262acf85005487af8911dc00d3587178c26bd0ff5443a89614da5f823028d::poc_registry::AppPocListingStatusChangedEvent",
+    concat!(poc_address!(), "::poc_registry::AppRegisteredEvent"),
+    concat!(poc_address!(), "::poc_registry::AppAddressUpdatedEvent"),
+    concat!(poc_address!(), "::poc_registry::AppEquityTokenUpdatedEvent"),
+    concat!(poc_address!(), "::poc_registry::AppCustodyUpdatedEvent"),
+    concat!(poc_address!(), "::poc_registry::AppStateChangedEvent"),
+    concat!(
+        poc_address!(),
+        "::poc_registry::AppPocListingStatusChangedEvent"
+    ),
 ];
 
 pub struct CustomEventExtractor;
