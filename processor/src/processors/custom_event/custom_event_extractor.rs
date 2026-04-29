@@ -15,7 +15,7 @@ use serde_json::Value;
 // =============== 配置：需要监听的事件目标 ===============
 macro_rules! poc_address {
     () => {
-        "0xc2a4cf3e193ab576ab94e1b6d03d3667864184676d1f65d6717391e3d091ec41"
+        "0x1"
     };
 }
 
