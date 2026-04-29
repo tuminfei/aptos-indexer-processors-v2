@@ -86,6 +86,38 @@
           },
           {
             "table": {
+              "name": "custom_events",
+              "schema": "public"
+            },
+            "configuration": {
+              "column_config": {},
+              "custom_column_names": {},
+              "custom_name": "custom_events",
+              "custom_root_fields": {}
+            },
+            "select_permissions": [
+              {
+                "role": "anonymous",
+                "permission": {
+                  "columns": [
+                    "transaction_version",
+                    "event_index",
+                    "account_address",
+                    "event_type",
+                    "event_data",
+                    "transaction_timestamp",
+                    "inserted_at"
+                  ],
+                  "filter": {},
+                  "limit": 100,
+                  "allow_aggregations": true
+                },
+                "comment": ""
+              }
+            ]
+          },
+          {
+            "table": {
               "name": "account_transactions",
               "schema": "public"
             },
