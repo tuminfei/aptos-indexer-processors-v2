@@ -127,7 +127,7 @@ mod sdk_fungible_asset_processor_tests {
      * - Events
      *      - 0x1::coin::WithdrawEvent
      *      - 0x1::coin::DepositEvents
-     *      - 0x1::aptos_coin::GasFeeEvent
+     *      - 0x1::topo_coin::GasFeeEvent
      *      - 0x1::fungible_asset::Deposit
      *      - 0x1::fungible_asset::Withdraw
      */
