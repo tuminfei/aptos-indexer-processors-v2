@@ -658,7 +658,7 @@ mod tests {
     #[test]
     fn test_paired_metadata_address() {
         assert_eq!(
-            get_paired_metadata_address("0x1::aptos_coin::AptosCoin"),
+            get_paired_metadata_address("0x1::topo_coin::TopoCoin"),
             *APT_METADATA_ADDRESS_HEX
         );
         assert_eq!(

@@ -245,7 +245,7 @@ mod tests {
         let f = filter("0x1", Some("coin"), Some("CoinEvent"));
         assert!(event_matches_filter(
             &make_event(
-                "0x0000000000000000000000000000000000000000000000000000000000000001::coin::CoinEvent<0x1::aptos_coin::AptosCoin>"
+                "0x0000000000000000000000000000000000000000000000000000000000000001::coin::CoinEvent<0x1::topo_coin::TopoCoin>"
             ),
             &f
         ));
