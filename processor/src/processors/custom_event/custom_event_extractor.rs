@@ -27,7 +27,7 @@ pub const TARGET_EVENT_TYPES: &[&str] = &[
     concat!(poc_address!(), "::poc_contribution::ContributionEvent"),
     // POC power store events
     concat!(poc_address!(), "::poc_power_store::OperatorChangedEvent"),
-    concat!(poc_address!(), "::poc_power_store::PowerUpdatedEvent"),
+    POWER_UPDATED_EVENT_TYPE,
     // POC registry events
     concat!(poc_address!(), "::poc_registry::AppRegisteredEvent"),
     concat!(poc_address!(), "::poc_registry::AppAddressUpdatedEvent"),
@@ -39,6 +39,8 @@ pub const TARGET_EVENT_TYPES: &[&str] = &[
         "::poc_registry::AppPocListingStatusChangedEvent"
     ),
 ];
+
+pub const POWER_UPDATED_EVENT_TYPE: &str = concat!(poc_address!(), "::poc_power_store::PowerUpdatedEvent");
 
 pub struct CustomEventExtractor;
 

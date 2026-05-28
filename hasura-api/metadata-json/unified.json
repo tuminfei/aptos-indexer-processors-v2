@@ -118,6 +118,37 @@
           },
           {
             "table": {
+              "name": "user_power",
+              "schema": "public"
+            },
+            "configuration": {
+              "column_config": {},
+              "custom_column_names": {},
+              "custom_name": "user_power",
+              "custom_root_fields": {}
+            },
+            "select_permissions": [
+              {
+                "role": "anonymous",
+                "permission": {
+                  "columns": [
+                    "user_address",
+                    "power",
+                    "last_transaction_version",
+                    "last_event_index",
+                    "last_transaction_timestamp",
+                    "inserted_at"
+                  ],
+                  "filter": {},
+                  "limit": 100,
+                  "allow_aggregations": true
+                },
+                "comment": ""
+              }
+            ]
+          },
+          {
+            "table": {
               "name": "account_transactions",
               "schema": "public"
             },

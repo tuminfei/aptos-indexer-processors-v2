@@ -85,6 +85,7 @@ bitflags! {
         const PUBLIC_KEY_AUTH_KEYS = 1 << 112;
         const GAS_FEES = 1 << 123;
         const CUSTOM_EVENTS = 1 << 124;
+        const USER_POWER = 1 << 125;
     }
 }
 

@@ -23,6 +23,18 @@ diesel::table! {
 }
 
 diesel::table! {
+    user_power (user_address) {
+        #[max_length = 66]
+        user_address -> Varchar,
+        power -> Int8,
+        last_transaction_version -> Int8,
+        last_event_index -> Int8,
+        last_transaction_timestamp -> Timestamp,
+        inserted_at -> Timestamp,
+    }
+}
+
+diesel::table! {
     ans_lookup_v2 (transaction_version, write_set_change_index) {
         transaction_version -> Int8,
         write_set_change_index -> Int8,
@@ -955,6 +967,7 @@ diesel::table! {
 diesel::allow_tables_to_appear_in_same_query!(
     account_transactions,
     custom_events,
+    user_power,
     ans_lookup_v2,
     ans_primary_name_v2,
     auth_key_account_addresses,
