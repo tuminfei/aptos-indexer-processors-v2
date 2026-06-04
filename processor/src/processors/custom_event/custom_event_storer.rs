@@ -5,8 +5,7 @@ use crate::processors::custom_event::custom_event_extractor::{
     CustomEventData, POWER_UPDATED_EVENT_TYPE,
 };
 use crate::processors::custom_event::custom_event_models::{
-    custom_events::NewCustomEvent,
-    user_power::NewUserPower,
+    custom_events::NewCustomEvent, user_power::NewUserPower,
 };
 use crate::processors::custom_event::custom_event_processor::CustomEventProcessorConfig;
 use crate::schema;
@@ -19,12 +18,12 @@ use aptos_indexer_processor_sdk::{
     utils::convert::standardize_address,
     utils::errors::ProcessorError,
 };
+use diesel::query_builder::QueryFragment;
 use diesel::{
     BoolExpressionMethods, ExpressionMethods,
     pg::{Pg, upsert::excluded},
     query_dsl::methods::FilterDsl,
 };
-use diesel::query_builder::QueryFragment;
 use serde_json::Value;
 
 pub struct CustomEventStorer
@@ -108,22 +107,26 @@ impl Processable for CustomEventStorer {
                 }
             },
             (Some(custom_events_fut), None) => {
-                custom_events_fut.await.map_err(|e| ProcessorError::DBStoreError {
-                    message: format!(
-                        "Failed to store versions {} to {}: {:?}",
-                        input.metadata.start_version, input.metadata.end_version, e,
-                    ),
-                    query: None,
-                })?;
+                custom_events_fut
+                    .await
+                    .map_err(|e| ProcessorError::DBStoreError {
+                        message: format!(
+                            "Failed to store versions {} to {}: {:?}",
+                            input.metadata.start_version, input.metadata.end_version, e,
+                        ),
+                        query: None,
+                    })?;
             },
             (None, Some(user_power_fut)) => {
-                user_power_fut.await.map_err(|e| ProcessorError::DBStoreError {
-                    message: format!(
-                        "Failed to store versions {} to {}: {:?}",
-                        input.metadata.start_version, input.metadata.end_version, e,
-                    ),
-                    query: None,
-                })?;
+                user_power_fut
+                    .await
+                    .map_err(|e| ProcessorError::DBStoreError {
+                        message: format!(
+                            "Failed to store versions {} to {}: {:?}",
+                            input.metadata.start_version, input.metadata.end_version, e,
+                        ),
+                        query: None,
+                    })?;
             },
             (None, None) => {},
         }
@@ -173,11 +176,9 @@ pub fn insert_user_power_query(
         .filter(
             last_transaction_version
                 .lt(excluded(last_transaction_version))
-                .or(
-                    last_transaction_version
-                        .eq(excluded(last_transaction_version))
-                        .and(last_event_index.le(excluded(last_event_index))),
-                ),
+                .or(last_transaction_version
+                    .eq(excluded(last_transaction_version))
+                    .and(last_event_index.le(excluded(last_event_index)))),
         )
 }
 
@@ -202,8 +203,10 @@ fn extract_user_powers(events: &[NewCustomEvent]) -> Vec<NewUserPower> {
         latest_user_powers
             .entry(user_power.user_address.clone())
             .and_modify(|existing: &mut NewUserPower| {
-                if (user_power.last_transaction_version, user_power.last_event_index)
-                    >= (existing.last_transaction_version, existing.last_event_index)
+                if (
+                    user_power.last_transaction_version,
+                    user_power.last_event_index,
+                ) >= (existing.last_transaction_version, existing.last_event_index)
                 {
                     *existing = user_power.clone();
                 }
@@ -217,8 +220,9 @@ fn extract_user_powers(events: &[NewCustomEvent]) -> Vec<NewUserPower> {
 }
 
 fn parse_user_power_event(event: &NewCustomEvent) -> Option<NewUserPower> {
-    let user = event.event_data.get("user").and_then(Value::as_str)?;
-    let power = parse_power(event.event_data.get("power")?)?;
+    let event_data = parse_event_data_value(&event.event_data)?;
+    let user = event_data.get("user").and_then(Value::as_str)?;
+    let power = parse_power(event_data.get("power")?)?;
 
     Some(NewUserPower {
         user_address: standardize_address(user),
@@ -229,15 +233,25 @@ fn parse_user_power_event(event: &NewCustomEvent) -> Option<NewUserPower> {
     })
 }
 
+fn parse_event_data_value(value: &Value) -> Option<Value> {
+    match value {
+        Value::Object(_) => Some(value.clone()),
+        Value::String(raw) => serde_json::from_str(raw).ok(),
+        _ => None,
+    }
+}
+
 fn parse_power(value: &Value) -> Option<i64> {
     match value {
         Value::Number(number) => number
             .as_i64()
             .or_else(|| number.as_u64().and_then(|value| i64::try_from(value).ok())),
-        Value::String(power) => power
-            .parse::<i64>()
-            .ok()
-            .or_else(|| power.parse::<u64>().ok().and_then(|value| i64::try_from(value).ok())),
+        Value::String(power) => power.parse::<i64>().ok().or_else(|| {
+            power
+                .parse::<u64>()
+                .ok()
+                .and_then(|value| i64::try_from(value).ok())
+        }),
         _ => None,
     }
 }
@@ -264,7 +278,23 @@ mod tests {
         let event = new_event(0, json!({"user": "0xa", "power": "42"}));
         let user_power = parse_user_power_event(&event).unwrap();
 
-        assert_eq!(user_power.user_address, "0x0000000000000000000000000000000a");
+        assert_eq!(
+            user_power.user_address,
+            "0x0000000000000000000000000000000a"
+        );
+        assert_eq!(user_power.power, 42);
+        assert_eq!(user_power.last_transaction_version, 100);
+    }
+
+    #[test]
+    fn parses_power_updated_event_from_stringified_json() {
+        let event = new_event(0, json!("{\"user\":\"0xa\",\"power\":\"42\"}"));
+        let user_power = parse_user_power_event(&event).unwrap();
+
+        assert_eq!(
+            user_power.user_address,
+            "0x0000000000000000000000000000000a"
+        );
         assert_eq!(user_power.power, 42);
         assert_eq!(user_power.last_transaction_version, 100);
     }
