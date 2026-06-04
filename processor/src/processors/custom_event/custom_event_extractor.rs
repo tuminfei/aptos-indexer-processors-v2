@@ -40,7 +40,7 @@ pub const TARGET_EVENT_TYPES: &[&str] = &[
     ),
 ];
 
-pub const POWER_UPDATED_EVENT_TYPE: &str = concat!(poc_address!(), "::poc_power_store::PowerUpdatedEvent");
+pub const POWER_UPDATED_EVENT_TYPE: &str = concat!(poc_address!(), "::poc_power_store::PowerUpdateStagedEvent");
 
 pub struct CustomEventExtractor;
 
