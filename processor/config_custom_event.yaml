@@ -11,7 +11,7 @@ server_config:
     type: default
     initial_starting_version: 0
   transaction_stream_config:
-    indexer_grpc_data_service_address: "http://127.0.0.1:50051"
+    indexer_grpc_data_service_address: "http://127.0.0.1:30041"
     auth_token: "AUTH_TOKEN"
     request_name_header: "custom_event_processor"
   db_config:
