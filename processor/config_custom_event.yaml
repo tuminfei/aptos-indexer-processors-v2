@@ -4,7 +4,7 @@ server_config:
   processor_config:
     type: custom_event_processor
     channel_size: 100
-    tables_to_write: ["custom_events"]
+    tables_to_write: ["custom_events", "user_power"]
     per_table_chunk_sizes:
       custom_events: 1000
   processor_mode:
