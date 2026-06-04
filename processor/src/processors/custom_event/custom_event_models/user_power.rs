@@ -13,6 +13,8 @@ use serde::{Deserialize, Serialize};
 pub struct UserPower {
     pub user_address: String,
     pub power: i64,
+    pub target_period: i64,
+    pub effective_period: i64,
     pub last_transaction_version: i64,
     pub last_event_index: i64,
     pub last_transaction_timestamp: NaiveDateTime,
@@ -24,6 +26,8 @@ pub struct UserPower {
 pub struct NewUserPower {
     pub user_address: String,
     pub power: i64,
+    pub target_period: i64,
+    pub effective_period: i64,
     pub last_transaction_version: i64,
     pub last_event_index: i64,
     pub last_transaction_timestamp: NaiveDateTime,

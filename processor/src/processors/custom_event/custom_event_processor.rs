@@ -4,8 +4,7 @@
 use crate::{
     MIGRATIONS,
     config::{
-        db_config::DbConfig,
-        indexer_processor_config::IndexerProcessorConfig,
+        db_config::DbConfig, indexer_processor_config::IndexerProcessorConfig,
         processor_config::ProcessorConfig,
     },
     processors::{
@@ -29,7 +28,7 @@ use aptos_indexer_processor_sdk::{
         checkpoint::PostgresChainIdChecker,
         database::{ArcDbPool, run_migrations},
     },
-    traits::{processor_trait::ProcessorTrait, IntoRunnableStep},
+    traits::{IntoRunnableStep, processor_trait::ProcessorTrait},
     utils::chain_id_check::check_or_update_chain_id,
 };
 use serde::{Deserialize, Serialize};
@@ -50,17 +49,18 @@ impl CustomEventProcessor {
     pub async fn new(config: IndexerProcessorConfig) -> Result<Self> {
         match config.db_config {
             DbConfig::PostgresConfig(ref postgres_config) => {
-                let conn_pool = aptos_indexer_processor_sdk::postgres::utils::database::new_db_pool(
-                    &postgres_config.connection_string,
-                    Some(postgres_config.db_pool_size),
-                )
-                .await
-                .map_err(|e| {
-                    anyhow::anyhow!(
-                        "Failed to create connection pool for PostgresConfig: {:?}",
-                        e
+                let conn_pool =
+                    aptos_indexer_processor_sdk::postgres::utils::database::new_db_pool(
+                        &postgres_config.connection_string,
+                        Some(postgres_config.db_pool_size),
                     )
-                })?;
+                    .await
+                    .map_err(|e| {
+                        anyhow::anyhow!(
+                            "Failed to create connection pool for PostgresConfig: {:?}",
+                            e
+                        )
+                    })?;
 
                 Ok(Self {
                     config,
@@ -128,11 +128,8 @@ impl ProcessorTrait for CustomEventProcessor {
         .await?;
 
         let custom_extractor = CustomEventExtractor::new();
-        let custom_storer = CustomEventStorer::new(
-            self.db_pool.clone(),
-            processor_config.clone(),
-            table_flags,
-        );
+        let custom_storer =
+            CustomEventStorer::new(self.db_pool.clone(), processor_config.clone(), table_flags);
 
         let version_tracker = VersionTrackerStep::new(
             PostgresProcessorStatusSaver::new(self.config.clone(), self.db_pool.clone()),

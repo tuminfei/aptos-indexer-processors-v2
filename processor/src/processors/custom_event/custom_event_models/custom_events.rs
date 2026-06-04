@@ -45,7 +45,7 @@ mod tests {
     fn test_new_custom_event_creation() {
         let timestamp = Utc::now().naive_utc();
         let event_data = json!({"amount": 100, "coin": "bird_coin"});
-        
+
         let new_event = NewCustomEvent {
             transaction_version: 123,
             event_index: 0,
@@ -67,7 +67,7 @@ mod tests {
     fn test_custom_event_json_serialization() {
         let timestamp = Utc::now().naive_utc();
         let event_data = json!({"amount": 100, "coin": "bird_coin"});
-        
+
         let new_event = NewCustomEvent {
             transaction_version: 123,
             event_index: 0,

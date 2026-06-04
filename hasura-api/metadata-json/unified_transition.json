@@ -813,6 +813,8 @@
                   "columns": [
                     "user_address",
                     "power",
+                    "target_period",
+                    "effective_period",
                     "last_transaction_version",
                     "last_event_index",
                     "last_transaction_timestamp",

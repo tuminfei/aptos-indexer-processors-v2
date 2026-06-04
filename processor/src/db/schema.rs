@@ -27,6 +27,8 @@ diesel::table! {
         #[max_length = 66]
         user_address -> Varchar,
         power -> Int8,
+        target_period -> Int8,
+        effective_period -> Int8,
         last_transaction_version -> Int8,
         last_event_index -> Int8,
         last_transaction_timestamp -> Timestamp,

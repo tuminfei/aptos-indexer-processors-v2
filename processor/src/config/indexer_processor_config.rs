@@ -20,7 +20,9 @@ use crate::{
     processors::{
         account_restoration::account_restoration_processor::AccountRestorationProcessor,
         account_transactions::account_transactions_processor::AccountTransactionsProcessor,
-        ans::ans_processor::AnsProcessor, default::default_processor::DefaultProcessor,
+        ans::ans_processor::AnsProcessor,
+        custom_event::custom_event_processor::CustomEventProcessor,
+        default::default_processor::DefaultProcessor,
         event_file::event_file_processor::EventFileProcessor,
         fungible_asset::fungible_asset_processor::FungibleAssetProcessor,
         gas_fees::gas_fee_processor::GasFeeProcessor,
@@ -28,7 +30,6 @@ use crate::{
         objects::objects_processor::ObjectsProcessor, stake::stake_processor::StakeProcessor,
         token_v2::token_v2_processor::TokenV2Processor,
         user_transaction::user_transaction_processor::UserTransactionProcessor,
-        custom_event::custom_event_processor::CustomEventProcessor,
     },
 };
 use anyhow::Result;

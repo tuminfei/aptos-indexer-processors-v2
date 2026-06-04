@@ -168,6 +168,8 @@ pub fn insert_user_power_query(
         .do_update()
         .set((
             power.eq(excluded(power)),
+            target_period.eq(excluded(target_period)),
+            effective_period.eq(excluded(effective_period)),
             last_transaction_version.eq(excluded(last_transaction_version)),
             last_event_index.eq(excluded(last_event_index)),
             last_transaction_timestamp.eq(excluded(last_transaction_timestamp)),
@@ -222,11 +224,15 @@ fn extract_user_powers(events: &[NewCustomEvent]) -> Vec<NewUserPower> {
 fn parse_user_power_event(event: &NewCustomEvent) -> Option<NewUserPower> {
     let event_data = parse_event_data_value(&event.event_data)?;
     let user = event_data.get("user").and_then(Value::as_str)?;
-    let power = parse_power(event_data.get("power")?)?;
+    let power = parse_i64(event_data.get("power")?)?;
+    let target_period = parse_i64(event_data.get("target_period")?)?;
+    let effective_period = parse_i64(event_data.get("effective_period")?)?;
 
     Some(NewUserPower {
         user_address: standardize_address(user),
         power,
+        target_period,
+        effective_period,
         last_transaction_version: event.transaction_version,
         last_event_index: event.event_index,
         last_transaction_timestamp: event.transaction_timestamp,
@@ -241,7 +247,7 @@ fn parse_event_data_value(value: &Value) -> Option<Value> {
     }
 }
 
-fn parse_power(value: &Value) -> Option<i64> {
+fn parse_i64(value: &Value) -> Option<i64> {
     match value {
         Value::Number(number) => number
             .as_i64()
@@ -275,7 +281,15 @@ mod tests {
 
     #[test]
     fn parses_power_updated_event() {
-        let event = new_event(0, json!({"user": "0xa", "power": "42"}));
+        let event = new_event(
+            0,
+            json!({
+                "user": "0xa",
+                "power": "42",
+                "target_period": "7",
+                "effective_period": "7"
+            }),
+        );
         let user_power = parse_user_power_event(&event).unwrap();
 
         assert_eq!(
@@ -283,12 +297,19 @@ mod tests {
             "0x0000000000000000000000000000000a"
         );
         assert_eq!(user_power.power, 42);
+        assert_eq!(user_power.target_period, 7);
+        assert_eq!(user_power.effective_period, 7);
         assert_eq!(user_power.last_transaction_version, 100);
     }
 
     #[test]
     fn parses_power_updated_event_from_stringified_json() {
-        let event = new_event(0, json!("{\"user\":\"0xa\",\"power\":\"42\"}"));
+        let event = new_event(
+            0,
+            json!(
+                "{\"user\":\"0xa\",\"power\":\"42\",\"target_period\":\"7\",\"effective_period\":\"7\"}"
+            ),
+        );
         let user_power = parse_user_power_event(&event).unwrap();
 
         assert_eq!(
@@ -296,22 +317,50 @@ mod tests {
             "0x0000000000000000000000000000000a"
         );
         assert_eq!(user_power.power, 42);
+        assert_eq!(user_power.target_period, 7);
+        assert_eq!(user_power.effective_period, 7);
         assert_eq!(user_power.last_transaction_version, 100);
     }
 
     #[test]
     fn keeps_latest_user_power_per_user() {
-        let older = new_event(0, json!({"user": "0xa", "power": 10}));
-        let newer = new_event(1, json!({"user": "0xa", "power": 99}));
+        let older = new_event(
+            0,
+            json!({
+                "user": "0xa",
+                "power": 10,
+                "target_period": 1,
+                "effective_period": 1
+            }),
+        );
+        let newer = new_event(
+            1,
+            json!({
+                "user": "0xa",
+                "power": 99,
+                "target_period": 2,
+                "effective_period": 2
+            }),
+        );
         let other = NewCustomEvent {
             event_type: "0x1::poc_power_store::OperatorChangedEvent".to_string(),
-            ..new_event(2, json!({"user": "0xa", "power": 1000}))
+            ..new_event(
+                2,
+                json!({
+                    "user": "0xa",
+                    "power": 1000,
+                    "target_period": 3,
+                    "effective_period": 3
+                }),
+            )
         };
 
         let user_powers = extract_user_powers(&[older, newer, other]);
 
         assert_eq!(user_powers.len(), 1);
         assert_eq!(user_powers[0].power, 99);
+        assert_eq!(user_powers[0].target_period, 2);
+        assert_eq!(user_powers[0].effective_period, 2);
         assert_eq!(user_powers[0].last_event_index, 1);
     }
 }

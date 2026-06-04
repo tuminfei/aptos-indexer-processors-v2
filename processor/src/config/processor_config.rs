@@ -18,6 +18,7 @@ use crate::{
                 ans_primary_name_v2::{ParquetAnsPrimaryNameV2, ParquetCurrentAnsPrimaryNameV2},
             },
         },
+        custom_event::custom_event_processor::CustomEventProcessorConfig,
         default::models::{
             block_metadata_transactions::ParquetBlockMetadataTransaction,
             move_modules::ParquetMoveModule,
@@ -59,7 +60,6 @@ use crate::{
             token_v2_processor::TokenV2ProcessorConfig,
         },
         user_transaction::models::user_transactions::ParquetUserTransaction,
-        custom_event::custom_event_processor::CustomEventProcessorConfig,
     },
 };
 use ahash::AHashMap;
