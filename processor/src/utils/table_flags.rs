@@ -83,6 +83,9 @@ bitflags! {
         // Account Restoration Processor: 111-120
         const AUTH_KEY_ACCOUNT_ADDRESSES = 1 << 111;
         const PUBLIC_KEY_AUTH_KEYS = 1 << 112;
+        const CONTRIBUTION_EVENTS = 1 << 113;
+        const APP_REGISTERED_EVENTS = 1 << 114;
+        const APP_REGISTERED = 1 << 115;
         const GAS_FEES = 1 << 123;
         const CUSTOM_EVENTS = 1 << 124;
         const USER_POWER = 1 << 125;

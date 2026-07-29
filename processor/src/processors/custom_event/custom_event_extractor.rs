@@ -21,23 +21,42 @@ macro_rules! poc_address {
 
 pub const POC_FRAMEWORK_ADDRESS: &str = poc_address!();
 
+pub const CONTRIBUTION_EVENT_TYPE: &str =
+    concat!(poc_address!(), "::poc_contribution::ContributionEvent");
+pub const APP_REGISTERED_EVENT_TYPE: &str =
+    concat!(poc_address!(), "::poc_registry::AppRegisteredEvent");
+pub const APP_ADDRESS_UPDATED_EVENT_TYPE: &str =
+    concat!(poc_address!(), "::poc_registry::AppAddressUpdatedEvent");
+pub const APP_EQUITY_TOKEN_UPDATED_EVENT_TYPE: &str =
+    concat!(poc_address!(), "::poc_registry::AppEquityTokenUpdatedEvent");
+pub const APP_CUSTODY_UPDATED_EVENT_TYPE: &str =
+    concat!(poc_address!(), "::poc_registry::AppCustodyUpdatedEvent");
+pub const APP_STATE_CHANGED_EVENT_TYPE: &str =
+    concat!(poc_address!(), "::poc_registry::AppStateChangedEvent");
+pub const APP_POC_LISTING_STATUS_CHANGED_EVENT_TYPE: &str = concat!(
+    poc_address!(),
+    "::poc_registry::AppPocListingStatusChangedEvent"
+);
+pub const APP_EFFECTIVE_WEIGHT_UPDATED_EVENT_TYPE: &str = concat!(
+    poc_address!(),
+    "::poc_registry::AppEffectiveWeightUpdatedEvent"
+);
+
 pub const TARGET_EVENT_TYPES: &[&str] = &[
     "0x1::fungible_asset::Deposit",
     // POC contribution events
-    concat!(poc_address!(), "::poc_contribution::ContributionEvent"),
+    CONTRIBUTION_EVENT_TYPE,
     // POC power store events
     concat!(poc_address!(), "::poc_power_store::OperatorChangedEvent"),
     POWER_UPDATED_EVENT_TYPE,
     // POC registry events
-    concat!(poc_address!(), "::poc_registry::AppRegisteredEvent"),
-    concat!(poc_address!(), "::poc_registry::AppAddressUpdatedEvent"),
-    concat!(poc_address!(), "::poc_registry::AppEquityTokenUpdatedEvent"),
-    concat!(poc_address!(), "::poc_registry::AppCustodyUpdatedEvent"),
-    concat!(poc_address!(), "::poc_registry::AppStateChangedEvent"),
-    concat!(
-        poc_address!(),
-        "::poc_registry::AppPocListingStatusChangedEvent"
-    ),
+    APP_REGISTERED_EVENT_TYPE,
+    APP_ADDRESS_UPDATED_EVENT_TYPE,
+    APP_EQUITY_TOKEN_UPDATED_EVENT_TYPE,
+    APP_CUSTODY_UPDATED_EVENT_TYPE,
+    APP_STATE_CHANGED_EVENT_TYPE,
+    APP_POC_LISTING_STATUS_CHANGED_EVENT_TYPE,
+    APP_EFFECTIVE_WEIGHT_UPDATED_EVENT_TYPE,
 ];
 
 pub const POWER_UPDATED_EVENT_TYPE: &str =

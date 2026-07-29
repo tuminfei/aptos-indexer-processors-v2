@@ -829,6 +829,106 @@
           },
           {
             "table": {
+              "name": "contribution_events",
+              "schema": "public"
+            },
+            "configuration": {
+              "column_config": {},
+              "custom_column_names": {},
+              "custom_name": "contribution_events",
+              "custom_root_fields": {}
+            },
+            "select_permissions": [
+              {
+                "role": "anonymous",
+                "permission": {
+                  "columns": [
+                    "transaction_version",
+                    "event_index",
+                    "contributor",
+                    "equity_token_address",
+                    "equity_amount",
+                    "app_address",
+                    "period",
+                    "transaction_timestamp",
+                    "inserted_at"
+                  ],
+                  "filter": {},
+                  "limit": 100,
+                  "allow_aggregations": true
+                }
+              }
+            ]
+          },
+          {
+            "table": {
+              "name": "app_registered_events",
+              "schema": "public"
+            },
+            "configuration": {
+              "column_config": {},
+              "custom_column_names": {},
+              "custom_name": "app_registered_events",
+              "custom_root_fields": {}
+            },
+            "select_permissions": [
+              {
+                "role": "anonymous",
+                "permission": {
+                  "columns": [
+                    "transaction_version",
+                    "event_index",
+                    "app_admin",
+                    "app_address",
+                    "equity_token_address",
+                    "custody_address",
+                    "transaction_timestamp",
+                    "inserted_at"
+                  ],
+                  "filter": {},
+                  "limit": 100,
+                  "allow_aggregations": true
+                }
+              }
+            ]
+          },
+          {
+            "table": {
+              "name": "app_registered",
+              "schema": "public"
+            },
+            "configuration": {
+              "column_config": {},
+              "custom_column_names": {},
+              "custom_name": "app_registered",
+              "custom_root_fields": {}
+            },
+            "select_permissions": [
+              {
+                "role": "anonymous",
+                "permission": {
+                  "columns": [
+                    "app_admin",
+                    "app_address",
+                    "equity_token_address",
+                    "custody_address",
+                    "app_state",
+                    "poc_listing_status",
+                    "effective_weight_pbs",
+                    "last_transaction_version",
+                    "last_event_index",
+                    "last_transaction_timestamp",
+                    "inserted_at"
+                  ],
+                  "filter": {},
+                  "limit": 100,
+                  "allow_aggregations": true
+                }
+              }
+            ]
+          },
+          {
+            "table": {
               "name": "account_transactions",
               "schema": "public"
             },

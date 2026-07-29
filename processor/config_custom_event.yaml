@@ -4,9 +4,13 @@ server_config:
   processor_config:
     type: custom_event_processor
     channel_size: 100
-    tables_to_write: ["custom_events", "user_power"]
+    tables_to_write: ["custom_events", "user_power", "contribution_events", "app_registered_events", "app_registered"]
     per_table_chunk_sizes:
+      app_registered: 1000
+      app_registered_events: 1000
+      contribution_events: 1000
       custom_events: 1000
+      user_power: 1000
   processor_mode:
     type: default
     initial_starting_version: 0

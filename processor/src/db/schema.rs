@@ -1,10 +1,64 @@
 // @generated automatically by Diesel CLI.
 
 diesel::table! {
+    app_registered (app_admin) {
+        #[max_length = 66]
+        app_admin -> Varchar,
+        #[max_length = 66]
+        app_address -> Nullable<Varchar>,
+        #[max_length = 66]
+        equity_token_address -> Nullable<Varchar>,
+        #[max_length = 66]
+        custody_address -> Nullable<Varchar>,
+        app_state -> Nullable<Int8>,
+        poc_listing_status -> Nullable<Int8>,
+        effective_weight_pbs -> Nullable<Int8>,
+        last_transaction_version -> Int8,
+        last_event_index -> Int8,
+        last_transaction_timestamp -> Timestamp,
+        inserted_at -> Timestamp,
+    }
+}
+
+diesel::table! {
+    app_registered_events (transaction_version, event_index) {
+        transaction_version -> Int8,
+        event_index -> Int8,
+        #[max_length = 66]
+        app_admin -> Varchar,
+        #[max_length = 66]
+        app_address -> Varchar,
+        #[max_length = 66]
+        equity_token_address -> Varchar,
+        #[max_length = 66]
+        custody_address -> Varchar,
+        transaction_timestamp -> Timestamp,
+        inserted_at -> Timestamp,
+    }
+}
+
+diesel::table! {
     account_transactions (account_address, transaction_version) {
         transaction_version -> Int8,
         #[max_length = 66]
         account_address -> Varchar,
+        inserted_at -> Timestamp,
+    }
+}
+
+diesel::table! {
+    contribution_events (transaction_version, event_index) {
+        transaction_version -> Int8,
+        event_index -> Int8,
+        #[max_length = 66]
+        contributor -> Varchar,
+        #[max_length = 66]
+        equity_token_address -> Varchar,
+        equity_amount -> Int8,
+        #[max_length = 66]
+        app_address -> Varchar,
+        period -> Int8,
+        transaction_timestamp -> Timestamp,
         inserted_at -> Timestamp,
     }
 }
@@ -967,7 +1021,10 @@ diesel::table! {
 }
 
 diesel::allow_tables_to_appear_in_same_query!(
+    app_registered,
+    app_registered_events,
     account_transactions,
+    contribution_events,
     custom_events,
     user_power,
     ans_lookup_v2,
