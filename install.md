@@ -42,19 +42,67 @@ cargo run --release -- -c config.yaml
 ### 步骤3：重新加载元数据
 
 ```bash
-# 进入hasura-api目录
-cd /Volumes/Data_dev/Documents/Codes/Rust/aptos-indexer-processors-v2/hasura-api
+# 从项目根目录进入 hasura-api 目录
+cd hasura-api
 
-# 使用curl命令通过API加载元数据
-curl -X POST http://localhost:10000/v1/metadata \
-  -H "Content-Type: application/json" \
-  -d "{
-    \"type\": \"replace_metadata\",
-    \"args\": $(cat metadata-json/unified.json)
-  }"
+# 通过 Metadata API 加载完整配置
+jq '{type: "replace_metadata", args: .}' metadata-json/unified.json \
+  | curl --fail-with-body -X POST http://localhost:10000/v1/metadata \
+      -H 'Content-Type: application/json' \
+      --data-binary @-
 ```
 
-### 步骤4：验证元数据加载成功
+成功时 Hasura 返回：
+
+```json
+{"message":"success"}
+```
+
+> Fungible Asset 数据迁移期间请将 `metadata-json/unified.json` 替换为
+> `metadata-json/unified_transition.json`。如果 Hasura 启用了 Admin Secret，
+> 还需要为 `curl` 添加 `-H 'X-Hasura-Admin-Secret: YOUR_ADMIN_SECRET'`。
+
+`replace_metadata` 会替换 Hasura 当前的完整 Metadata。执行前应确认选择了与当前
+部署阶段对应的文件。
+
+### 步骤4：配置 `app_registered` Array Relationships
+
+以下两个 Array Relationship 已保存在 `metadata-json/unified.json` 和
+`metadata-json/unified_transition.json` 中。完成步骤3后会自动生效，无需再在
+Hasura Console 中手工创建。
+
+| Relationship 名称 | From | Target table | To |
+| --- | --- | --- | --- |
+| `fungible_asset_balances` | `app_registered.equity_token_address` | `current_fungible_asset_balances` | `current_fungible_asset_balances.asset_type` |
+| `contribution_events` | `app_registered.app_address` | `contribution_events` | `contribution_events.app_address` |
+
+对应关系如下：
+
+```text
+app_registered.equity_token_address
+    = current_fungible_asset_balances.asset_type
+
+app_registered.app_address
+    = contribution_events.app_address
+```
+
+如需在 Hasura Console 中检查或手工配置，请进入：
+
+```text
+Data → app_registered → Relationships → Add Relationship
+```
+
+两项关系都选择 `Array Relationship` 和 `Manual Configuration`，然后按照上表填写
+relationship 名称、target table 和 column mapping。保存后，GraphQL Schema 中的
+`app_registered` 将包含：
+
+```text
+app_registered
+├── fungible_asset_balances[]
+└── contribution_events[]
+```
+
+### 步骤5：验证元数据加载成功
 
 1. **访问Hasura控制台**：
    ```
@@ -64,6 +112,29 @@ curl -X POST http://localhost:10000/v1/metadata \
 2. **检查表结构**：
    - 在控制台中，查看"Data"标签页，确认是否能看到processor创建的表结构
    - 特别是确认 `processor_status` 表是否存在
+   - 打开 `app_registered → Relationships`，确认存在
+     `fungible_asset_balances` 和 `contribution_events`
+
+3. **通过 GraphQL 验证关系**：
+
+   ```graphql
+   query AppRegisteredRelationships {
+     app_registered(limit: 10) {
+       app_address
+       equity_token_address
+       contribution_events {
+         contributor
+         equity_amount
+         period
+       }
+       fungible_asset_balances {
+         asset_type
+         owner_address
+         amount
+       }
+     }
+   }
+   ```
 
 ## 注意事项
 
@@ -91,15 +162,13 @@ docker run -d \
   # 添加其他需要的环境变量
   hasura/graphql-engine:latest
 
-# 3. 重新加载元数据
-cd /Users/tuminfei/Documents/Code/Rust/aptos-indexer-processors-v2/hasura-api
+# 3. 从项目根目录进入 hasura-api，并重新加载元数据
+cd hasura-api
 
-curl -X POST http://localhost:10000/v1/metadata \
-  -H "Content-Type: application/json" \
-  -d "{
-    \"type\": \"replace_metadata\",
-    \"args\": $(cat metadata-json/unified.json)
-  }"
+jq '{type: "replace_metadata", args: .}' metadata-json/unified.json \
+  | curl --fail-with-body -X POST http://localhost:10000/v1/metadata \
+      -H 'Content-Type: application/json' \
+      --data-binary @-
 ```
 
 通过以上步骤，您应该能够成功加载元数据并开始使用Hasura的GraphQL API来查询processor索引的数据。
