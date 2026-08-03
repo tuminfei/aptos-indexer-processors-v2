@@ -897,6 +897,38 @@
               "name": "app_registered",
               "schema": "public"
             },
+            "array_relationships": [
+              {
+                "name": "contribution_events",
+                "using": {
+                  "manual_configuration": {
+                    "column_mapping": {
+                      "app_address": "app_address"
+                    },
+                    "insertion_order": null,
+                    "remote_table": {
+                      "name": "contribution_events",
+                      "schema": "public"
+                    }
+                  }
+                }
+              },
+              {
+                "name": "fungible_asset_balances",
+                "using": {
+                  "manual_configuration": {
+                    "column_mapping": {
+                      "equity_token_address": "asset_type"
+                    },
+                    "insertion_order": null,
+                    "remote_table": {
+                      "name": "current_fungible_asset_balances",
+                      "schema": "public"
+                    }
+                  }
+                }
+              }
+            ],
             "configuration": {
               "column_config": {},
               "custom_column_names": {},
