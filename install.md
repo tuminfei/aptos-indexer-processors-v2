@@ -52,6 +52,17 @@ jq '{type: "replace_metadata", args: .}' metadata-json/unified.json \
       --data-binary @-
 ```
 
+如果本机没有安装 `jq`，可以使用以下纯 `curl` 方式：
+
+```bash
+curl --fail-with-body -X POST http://localhost:10000/v1/metadata \
+  -H 'Content-Type: application/json' \
+  -d "{
+    \"type\": \"replace_metadata\",
+    \"args\": $(cat metadata-json/unified.json)
+  }"
+```
+
 成功时 Hasura 返回：
 
 ```json
@@ -169,6 +180,17 @@ jq '{type: "replace_metadata", args: .}' metadata-json/unified.json \
   | curl --fail-with-body -X POST http://localhost:10000/v1/metadata \
       -H 'Content-Type: application/json' \
       --data-binary @-
+```
+
+没有安装 `jq` 时，可改用：
+
+```bash
+curl --fail-with-body -X POST http://localhost:10000/v1/metadata \
+  -H 'Content-Type: application/json' \
+  -d "{
+    \"type\": \"replace_metadata\",
+    \"args\": $(cat metadata-json/unified.json)
+  }"
 ```
 
 通过以上步骤，您应该能够成功加载元数据并开始使用Hasura的GraphQL API来查询processor索引的数据。
