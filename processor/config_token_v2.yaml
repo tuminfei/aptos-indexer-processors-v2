@@ -1,5 +1,5 @@
 # Config for token_v2_processor
-health_check_port: 8086
+health_check_port: 8089
 server_config:
   processor_config:
     type: token_v2_processor
