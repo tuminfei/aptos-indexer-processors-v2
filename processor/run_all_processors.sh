@@ -10,6 +10,12 @@ nohup ./target/release/processor -c ./processor/config_fungible_asset.yaml > fun
 FUNGIBLE_PID=$!
 echo "fungible_asset_processor started with PID: $FUNGIBLE_PID"
 
+# 运行 token_v2_processor
+echo "Starting token_v2_processor..."
+nohup ./target/release/processor -c ./processor/config_token_v2.yaml > token_v2_processor.log 2>&1 &
+TOKEN_V2_PID=$!
+echo "token_v2_processor started with PID: $TOKEN_V2_PID"
+
 # 运行 user_transaction_processor
 echo "Starting user_transaction_processor..."
 nohup ./target/release/processor -c ./processor/config_user_transaction.yaml > user_transaction_processor.log 2>&1 &
@@ -37,6 +43,7 @@ echo "custom_event_processor started with PID: $CUSTOM_EVENT_PID"
 echo "All processors started successfully!"
 echo "PIDs:"
 echo "fungible_asset_processor: $FUNGIBLE_PID"
+echo "token_v2_processor: $TOKEN_V2_PID"
 echo "user_transaction_processor: $USER_TXN_PID"
 echo "account_transactions_processor: $ACCOUNT_TXN_PID"
 echo "default_processor: $DEFAULT_PID"

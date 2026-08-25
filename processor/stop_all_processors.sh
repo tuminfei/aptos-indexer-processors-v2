@@ -4,7 +4,7 @@
 
 echo "Stopping all processors..."
 
-# 查找所有处理器进程
+# 查找所有处理器进程（包括 token_v2_processor）
 PROCESSORS=$(ps aux | grep "./target/release/processor" | grep -v grep)
 
 if [ -z "$PROCESSORS" ]; then
