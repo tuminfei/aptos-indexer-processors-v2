@@ -10,6 +10,7 @@ use super::{
     v2_fungible_asset_utils::FungibleAssetStoreDeletionEvent,
 };
 use crate::{
+    impl_mem_size,
     parquet_processors::parquet_utils::util::{HasVersion, NamedTable},
     processors::{
         fungible_asset::{
@@ -21,16 +22,13 @@ use crate::{
         user_transaction::models::signature_utils::parent_signature_utils::get_fee_payer_address,
     },
     schema::fungible_asset_activities,
+    utils::NATIVE_COIN_TYPE_STR,
 };
 use ahash::AHashMap;
-use allocative::Allocative;
 use anyhow::Context;
 use aptos_indexer_processor_sdk::{
     aptos_protos::transaction::v1::{Event, TransactionInfo, UserTransactionRequest},
-    utils::{
-        constants::APTOS_COIN_TYPE_STR,
-        convert::{bigdecimal_to_u64, standardize_address, u64_to_bigdecimal},
-    },
+    utils::convert::{bigdecimal_to_u64, standardize_address, u64_to_bigdecimal},
 };
 use bigdecimal::{BigDecimal, Zero};
 use field_count::FieldCount;
@@ -292,7 +290,7 @@ impl FungibleAssetActivity {
             None => None,
         };
         let owner_address = standardize_address(&user_transaction_request.sender.to_string());
-        let coin_type = APTOS_COIN_TYPE_STR.to_string();
+        let coin_type = NATIVE_COIN_TYPE_STR.to_string();
 
         // Storage id should be derived (for the FA migration)
         let metadata_addr = get_paired_metadata_address(&coin_type);
@@ -323,9 +321,7 @@ impl FungibleAssetActivity {
 }
 
 // Parquet Model
-#[derive(
-    Allocative, Clone, Debug, Default, Deserialize, FieldCount, ParquetRecordWriter, Serialize,
-)]
+#[derive(Clone, Debug, Default, Deserialize, FieldCount, ParquetRecordWriter, Serialize)]
 pub struct ParquetFungibleAssetActivity {
     pub txn_version: i64,
     pub event_index: i64,
@@ -341,7 +337,6 @@ pub struct ParquetFungibleAssetActivity {
     pub entry_function_id_str: Option<String>,
     pub block_height: i64,
     pub token_standard: String,
-    #[allocative(skip)]
     pub block_timestamp: chrono::NaiveDateTime,
     pub storage_refund_octa: u64,
 }
@@ -424,3 +419,16 @@ impl From<FungibleAssetActivity> for PostgresFungibleAssetActivity {
         }
     }
 }
+
+// MemSize impls for the GCS buffer flush threshold (replaces `allocative`).
+impl_mem_size!(
+    ParquetFungibleAssetActivity,
+    owner_address,
+    storage_id,
+    asset_type,
+    amount,
+    event_type,
+    gas_fee_payer_address,
+    entry_function_id_str,
+    token_standard
+);

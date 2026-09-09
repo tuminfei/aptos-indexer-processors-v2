@@ -46,7 +46,7 @@ cargo run --release -- -c config.yaml
 cd hasura-api
 
 # 通过 Metadata API 加载完整配置
-jq '{type: "replace_metadata", args: .}' metadata-json/unified.json \
+jq '{type: "replace_metadata", args: .}' metadata-json/metadata.json \
   | curl --fail-with-body -X POST http://localhost:10000/v1/metadata \
       -H 'Content-Type: application/json' \
       --data-binary @-
@@ -59,7 +59,7 @@ curl --fail-with-body -X POST http://localhost:10000/v1/metadata \
   -H 'Content-Type: application/json' \
   -d "{
     \"type\": \"replace_metadata\",
-    \"args\": $(cat metadata-json/unified.json)
+    \"args\": $(cat metadata-json/metadata.json)
   }"
 ```
 
@@ -69,7 +69,7 @@ curl --fail-with-body -X POST http://localhost:10000/v1/metadata \
 {"message":"success"}
 ```
 
-> Fungible Asset 数据迁移期间请将 `metadata-json/unified.json` 替换为
+> Fungible Asset 数据迁移期间请将 `metadata-json/metadata.json` 替换为
 > `metadata-json/unified_transition.json`。如果 Hasura 启用了 Admin Secret，
 > 还需要为 `curl` 添加 `-H 'X-Hasura-Admin-Secret: YOUR_ADMIN_SECRET'`。
 
@@ -78,7 +78,7 @@ curl --fail-with-body -X POST http://localhost:10000/v1/metadata \
 
 ### 步骤4：配置 `app_registered` Array Relationships
 
-以下两个 Array Relationship 已保存在 `metadata-json/unified.json` 和
+以下两个 Array Relationship 已保存在 `metadata-json/metadata.json` 和
 `metadata-json/unified_transition.json` 中。完成步骤3后会自动生效，无需再在
 Hasura Console 中手工创建。
 
@@ -176,7 +176,7 @@ docker run -d \
 # 3. 从项目根目录进入 hasura-api，并重新加载元数据
 cd hasura-api
 
-jq '{type: "replace_metadata", args: .}' metadata-json/unified.json \
+jq '{type: "replace_metadata", args: .}' metadata-json/metadata.json \
   | curl --fail-with-body -X POST http://localhost:10000/v1/metadata \
       -H 'Content-Type: application/json' \
       --data-binary @-
@@ -189,7 +189,7 @@ curl --fail-with-body -X POST http://localhost:10000/v1/metadata \
   -H 'Content-Type: application/json' \
   -d "{
     \"type\": \"replace_metadata\",
-    \"args\": $(cat metadata-json/unified.json)
+    \"args\": $(cat metadata-json/metadata.json)
   }"
 ```
 

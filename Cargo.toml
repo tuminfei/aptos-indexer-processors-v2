@@ -18,18 +18,16 @@ rust-version = "1.93.1"
 [workspace.dependencies]
 
 ahash = { version = "0.8.12", features = ["serde"] }
-allocative = "0.3.4"
-allocative_derive = "0.3.3"
 anyhow = "1.0.102"
 # Do NOT enable the postgres_full feature here, it is conditionally enabled in a feature
 # block in the Cargo.toml file for the processor crate.
 # https://github.com/aptos-labs/aptos-indexer-processors/pull/325
 # Do NOT enable the testing_framework feature here, it is conditionally enabled as a dev dependency
 # in the integration-tests/Cargo.toml file.
-aptos-indexer-processor-sdk = { git = "https://github.com/Topo-Labs/topo-indexer-processor-sdk.git", branch = "aptos-indexer-processor-sdk-v2.2.2", features = [
+aptos-indexer-processor-sdk = { git = "https://github.com/aptos-labs/aptos-indexer-processor-sdk.git", tag = "aptos-indexer-processor-sdk-v2.3.0", features = [
     "postgres_partial",
 ] }
-aptos-indexer-test-transactions = { git = "https://github.com/aptos-labs/aptos-core.git", rev = "beb39c01fe275bfe1c275e0777a10f2521b858b0" }
+aptos-indexer-test-transactions = { git = "https://github.com/aptos-labs/aptos-core.git", rev = "5a42c96be3ac94ef85ab6e53b618390dd343852f" }
 assert-json-diff = "2.0.2"
 async-trait = "0.1.89"
 backtrace = "0.3.76"
@@ -72,6 +70,7 @@ google-cloud-googleapis = "0.10.0"
 google-cloud-pubsub = "0.18.0"
 google-cloud-storage = "0.13.0"
 hex = "0.4.3"
+hmac = "0.12.1"
 hyper = { version = "0.14.18", features = ["full"] }
 itertools = "0.12.1"
 json-structural-diff = "0.1.0"

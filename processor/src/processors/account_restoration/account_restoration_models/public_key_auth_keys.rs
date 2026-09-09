@@ -199,10 +199,10 @@ impl PublicKeyAuthKeyHelper {
                 };
                 let multi_key: MultiKey = bcs::from_bytes(&event.public_key).unwrap();
                 let mut keys = vec![];
-                for i in 0..multi_key.public_keys.len() {
+                for (i, public_key) in multi_key.public_keys.iter().enumerate() {
                     keys.push(PublicKeyAuthKeyHelperInner {
-                        public_key: multi_key.public_keys[i].to_string_without_variant(),
-                        public_key_type: multi_key.public_keys[i].get_public_key_type(),
+                        public_key: public_key.to_string_without_variant(),
+                        public_key_type: public_key.get_public_key_type(),
                         is_public_key_used: verified_public_key_indices.contains(&i),
                     });
                 }
@@ -299,6 +299,8 @@ fn any_public_key_to_serialized_string(key: &AnyPublicKey) -> String {
         },
         AnyPublicKeyEnum::Keyless => {},
         AnyPublicKeyEnum::FederatedKeyless => {},
+        // TODO: Add the correct BCS length prefix once the public key size is confirmed.
+        AnyPublicKeyEnum::SlhDsaSha2128s => {},
         AnyPublicKeyEnum::Unspecified => {
             tracing::warn!("Unspecified public key type not supported");
         },

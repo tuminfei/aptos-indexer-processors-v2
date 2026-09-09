@@ -13,6 +13,7 @@ use super::{
 };
 use crate::{
     db::resources::{BURN_ADDR, FromWriteResource},
+    impl_mem_size,
     parquet_processors::parquet_utils::util::{HasVersion, NamedTable},
     processors::{
         default::models::move_resources::MoveResource,
@@ -30,13 +31,13 @@ use crate::{
         current_fungible_asset_balances, current_fungible_asset_balances_legacy,
         fungible_asset_balances,
     },
+    utils::NATIVE_COIN_TYPE_STR,
 };
 use ahash::AHashMap;
-use allocative_derive::Allocative;
 use aptos_indexer_processor_sdk::{
     aptos_protos::transaction::v1::{DeleteResource, WriteResource},
     utils::{
-        constants::{APT_METADATA_ADDRESS_HEX, APT_METADATA_ADDRESS_RAW, APTOS_COIN_TYPE_STR},
+        constants::{APT_METADATA_ADDRESS_HEX, APT_METADATA_ADDRESS_RAW},
         convert::{hex_to_raw_bytes, sha3_256, standardize_address},
     },
 };
@@ -88,7 +89,7 @@ pub struct CurrentUnifiedFungibleAssetBalance {
 }
 
 pub fn get_paired_metadata_address(coin_type_name: &str) -> String {
-    if coin_type_name == APTOS_COIN_TYPE_STR {
+    if coin_type_name == NATIVE_COIN_TYPE_STR {
         APT_METADATA_ADDRESS_HEX.clone()
     } else {
         let mut preimage = APT_METADATA_ADDRESS_RAW.to_vec();
@@ -426,9 +427,7 @@ impl FungibleAssetBalance {
 }
 
 // Parquet Models
-#[derive(
-    Allocative, Clone, Debug, Default, Deserialize, FieldCount, ParquetRecordWriter, Serialize,
-)]
+#[derive(Clone, Debug, Default, Deserialize, FieldCount, ParquetRecordWriter, Serialize)]
 pub struct ParquetFungibleAssetBalance {
     pub txn_version: i64,
     pub write_set_change_index: i64,
@@ -438,7 +437,6 @@ pub struct ParquetFungibleAssetBalance {
     pub is_primary: bool,
     pub is_frozen: bool,
     pub amount: String, // it is a string representation of the u128
-    #[allocative(skip)]
     pub block_timestamp: chrono::NaiveDateTime,
     pub token_standard: String,
 }
@@ -469,9 +467,7 @@ impl From<FungibleAssetBalance> for ParquetFungibleAssetBalance {
     }
 }
 
-#[derive(
-    Allocative, Clone, Debug, Default, Deserialize, FieldCount, ParquetRecordWriter, Serialize,
-)]
+#[derive(Clone, Debug, Default, Deserialize, FieldCount, ParquetRecordWriter, Serialize)]
 pub struct ParquetCurrentUnifiedFungibleAssetBalance {
     pub storage_id: String,
     pub owner_address: String,
@@ -484,9 +480,7 @@ pub struct ParquetCurrentUnifiedFungibleAssetBalance {
     pub amount_v2: Option<String>, // it is a string representation of the u128
     pub last_transaction_version_v1: Option<i64>,
     pub last_transaction_version_v2: Option<i64>,
-    #[allocative(skip)]
     pub last_transaction_timestamp_v1: Option<chrono::NaiveDateTime>,
-    #[allocative(skip)]
     pub last_transaction_timestamp_v2: Option<chrono::NaiveDateTime>,
 }
 
@@ -669,3 +663,13 @@ mod tests {
         );
     }
 }
+
+// MemSize impls for the GCS buffer flush threshold (replaces `allocative`).
+impl_mem_size!(
+    ParquetFungibleAssetBalance,
+    storage_id,
+    owner_address,
+    asset_type,
+    amount,
+    token_standard
+);

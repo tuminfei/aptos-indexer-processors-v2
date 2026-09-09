@@ -21,14 +21,16 @@ use crate::{
         account_restoration::account_restoration_processor::AccountRestorationProcessor,
         account_transactions::account_transactions_processor::AccountTransactionsProcessor,
         ans::ans_processor::AnsProcessor,
+        confidential_asset::confidential_asset_processor::ConfidentialAssetProcessor,
         custom_event::custom_event_processor::CustomEventProcessor,
         default::default_processor::DefaultProcessor,
         event_file::event_file_processor::EventFileProcessor,
         fungible_asset::fungible_asset_processor::FungibleAssetProcessor,
         gas_fees::gas_fee_processor::GasFeeProcessor,
         monitoring::monitoring_processor::MonitoringProcessor,
-        objects::objects_processor::ObjectsProcessor, stake::stake_processor::StakeProcessor,
-        token_v2::token_v2_processor::TokenV2Processor,
+        objects::objects_processor::ObjectsProcessor,
+        shelby_blobs::shelby_blobs_processor::ShelbyBlobsProcessor,
+        stake::stake_processor::StakeProcessor, token_v2::token_v2_processor::TokenV2Processor,
         user_transaction::user_transaction_processor::UserTransactionProcessor,
     },
 };
@@ -77,6 +79,10 @@ impl RunnableConfig for IndexerProcessorConfig {
                 let acc_rest_processor = AccountRestorationProcessor::new(self.clone()).await?;
                 acc_rest_processor.run_processor().await
             },
+            ProcessorConfig::ConfidentialAssetProcessor(_) => {
+                let processor = ConfidentialAssetProcessor::new(self.clone()).await?;
+                processor.run_processor().await
+            },
             ProcessorConfig::DefaultProcessor(_) => {
                 let default_processor = DefaultProcessor::new(self.clone()).await?;
                 default_processor.run_processor().await
@@ -104,6 +110,10 @@ impl RunnableConfig for IndexerProcessorConfig {
             ProcessorConfig::ObjectsProcessor(_) => {
                 let objects_processor = ObjectsProcessor::new(self.clone()).await?;
                 objects_processor.run_processor().await
+            },
+            ProcessorConfig::ShelbyBlobsProcessor(_) => {
+                let shelby_blobs_processor = ShelbyBlobsProcessor::new(self.clone()).await?;
+                shelby_blobs_processor.run_processor().await
             },
             ProcessorConfig::EventFileProcessor(_) => {
                 let event_file_processor = EventFileProcessor::new(self.clone()).await?;

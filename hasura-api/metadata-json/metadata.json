@@ -1,5 +1,5 @@
 {
-  "resource_version": 10002,
+  "resource_version": 10003,
   "metadata": {
     "version": 3,
     "sources": [
@@ -419,6 +419,86 @@
           },
           {
             "table": {
+              "name": "confidential_asset_activities",
+              "schema": "public"
+            },
+            "object_relationships": [
+              {
+                "name": "metadata",
+                "using": {
+                  "manual_configuration": {
+                    "column_mapping": {
+                      "asset_type": "asset_type"
+                    },
+                    "insertion_order": null,
+                    "remote_table": {
+                      "name": "fungible_asset_metadata",
+                      "schema": "public"
+                    }
+                  }
+                }
+              }
+            ],
+            "array_relationships": [
+              {
+                "name": "owner_aptos_names",
+                "using": {
+                  "manual_configuration": {
+                    "column_mapping": {
+                      "owner_address": "registered_address"
+                    },
+                    "insertion_order": null,
+                    "remote_table": {
+                      "name": "current_aptos_names",
+                      "schema": "public"
+                    }
+                  }
+                }
+              },
+              {
+                "name": "counterparty_aptos_names",
+                "using": {
+                  "manual_configuration": {
+                    "column_mapping": {
+                      "counterparty_address": "registered_address"
+                    },
+                    "insertion_order": null,
+                    "remote_table": {
+                      "name": "current_aptos_names",
+                      "schema": "public"
+                    }
+                  }
+                }
+              }
+            ],
+            "select_permissions": [
+              {
+                "role": "anonymous",
+                "permission": {
+                  "columns": [
+                    "amount",
+                    "asset_type",
+                    "block_height",
+                    "counterparty_address",
+                    "entry_function_id_str",
+                    "event_data",
+                    "event_data_version",
+                    "event_index",
+                    "event_type",
+                    "is_transaction_success",
+                    "owner_address",
+                    "transaction_timestamp",
+                    "transaction_version"
+                  ],
+                  "filter": {},
+                  "limit": 100
+                },
+                "comment": ""
+              }
+            ]
+          },
+          {
+            "table": {
               "name": "current_ans_lookup_v2",
               "schema": "public"
             },
@@ -541,23 +621,7 @@
               "name": "current_collections_v2",
               "schema": "public"
             },
-            "object_relationships": [
-              {
-                "name": "cdn_asset_uris",
-                "using": {
-                  "manual_configuration": {
-                    "column_mapping": {
-                      "uri": "asset_uri"
-                    },
-                    "insertion_order": null,
-                    "remote_table": {
-                      "name": "parsed_asset_uris",
-                      "schema": "nft_metadata_crawler"
-                    }
-                  }
-                }
-              }
-            ],
+            "object_relationships": [],
             "select_permissions": [
               {
                 "role": "anonymous",
@@ -846,21 +910,6 @@
                     "remote_table": {
                       "name": "current_aptos_names",
                       "schema": "public"
-                    }
-                  }
-                }
-              },
-              {
-                "name": "cdn_asset_uris",
-                "using": {
-                  "manual_configuration": {
-                    "column_mapping": {
-                      "token_uri": "asset_uri"
-                    },
-                    "insertion_order": null,
-                    "remote_table": {
-                      "name": "parsed_asset_uris",
-                      "schema": "nft_metadata_crawler"
                     }
                   }
                 }
@@ -1329,19 +1378,23 @@
           },
           {
             "table": {
-              "name": "indexer_status",
-              "schema": "public"
+              "name": "ledger_infos",
+              "schema": "processor_metadata"
+            },
+            "configuration": {
+              "column_config": {},
+              "custom_column_names": {},
+              "custom_name": "ledger_infos",
+              "custom_root_fields": {}
             },
             "select_permissions": [
               {
                 "role": "anonymous",
                 "permission": {
                   "columns": [
-                    "db",
-                    "is_indexer_up"
+                    "chain_id"
                   ],
-                  "filter": {},
-                  "limit": 100
+                  "filter": {}
                 }
               }
             ]
@@ -1362,6 +1415,34 @@
                   "filter": {},
                   "limit": 100
                 }
+              }
+            ]
+          },
+          {
+            "table": {
+              "name": "processor_status",
+              "schema": "processor_metadata"
+            },
+            "configuration": {
+              "column_config": {},
+              "custom_column_names": {},
+              "custom_name": "processor_status",
+              "custom_root_fields": {}
+            },
+            "select_permissions": [
+              {
+                "role": "anonymous",
+                "permission": {
+                  "columns": [
+                    "last_success_version",
+                    "processor",
+                    "last_transaction_timestamp",
+                    "last_updated"
+                  ],
+                  "filter": {},
+                  "limit": 100
+                },
+                "comment": ""
               }
             ]
           },

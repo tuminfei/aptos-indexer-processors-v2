@@ -173,6 +173,137 @@ diesel::table! {
 }
 
 diesel::table! {
+    shelby_object_activities (transaction_version, event_index) {
+        transaction_version -> Int8,
+        event_index -> Int8,
+        event_type -> Text,
+        #[max_length = 66]
+        transaction_hash -> Varchar,
+        object_name -> Text,
+        #[max_length = 66]
+        owner -> Varchar,
+        blob_uid -> Nullable<Int8>,
+        multipart_uid -> Nullable<Int8>,
+        timestamp -> Timestamp,
+        inserted_at -> Timestamp,
+    }
+}
+
+diesel::table! {
+    shelby_object_parts (multipart_uid, part_number) {
+        multipart_uid -> Int8,
+        part_number -> Int4,
+        blob_uid -> Int8,
+        offset_in_object -> Int8,
+        end_offset -> Int8,
+        stored_size -> Int8,
+        inserted_at -> Timestamp,
+    }
+}
+
+diesel::table! {
+    shelby_objects (name) {
+        name -> Text,
+        #[max_length = 66]
+        owner -> Varchar,
+        etag -> Text,
+        encryption -> Text,
+        encoding -> Text,
+        location_name -> Text,
+        plaintext_size -> Int8,
+        stored_size -> Int8,
+        blob_uid -> Nullable<Int8>,
+        multipart_uid -> Nullable<Int8>,
+        part_count -> Nullable<Int4>,
+        kind -> Nullable<Text>,
+        committed_at_micros -> Int8,
+        last_transaction_version -> Int8,
+        inserted_at -> Timestamp,
+    }
+}
+
+diesel::table! {
+    shelby_open_multipart_parts (multipart_uid, part_number) {
+        multipart_uid -> Int8,
+        part_number -> Int4,
+        blob_uid -> Int8,
+        plaintext_size -> Int8,
+        stored_size -> Int8,
+        etag -> Text,
+        committed_at_micros -> Int8,
+        last_transaction_version -> Int8,
+        inserted_at -> Timestamp,
+    }
+}
+
+diesel::table! {
+    shelby_pending_blobs (uid) {
+        uid -> Int8,
+        #[max_length = 66]
+        owner -> Varchar,
+        location_name -> Text,
+        creation_micros -> Int8,
+        stored_size -> Int8,
+        last_transaction_version -> Int8,
+        inserted_at -> Timestamp,
+    }
+}
+
+diesel::table! {
+    shelby_open_multipart_uploads (multipart_uid) {
+        multipart_uid -> Int8,
+        object_name -> Text,
+        #[max_length = 66]
+        owner -> Varchar,
+        encryption -> Text,
+        encoding -> Text,
+        location_name -> Text,
+        created_at_micros -> Int8,
+        last_transaction_version -> Int8,
+        inserted_at -> Timestamp,
+    }
+}
+
+diesel::table! {
+    placement_group_slots (placement_group, slot_index) {
+        #[max_length = 66]
+        placement_group -> Varchar,
+        slot_index -> Numeric,
+        #[max_length = 66]
+        storage_provider -> Varchar,
+        status -> Text,
+        updated_at -> Numeric,
+        last_transaction_version -> Int8,
+        inserted_at -> Timestamp,
+    }
+}
+
+diesel::table! {
+    confidential_asset_activities (transaction_version, event_index) {
+        transaction_version -> Int8,
+        event_index -> Int8,
+        #[max_length = 50]
+        event_type -> Varchar,
+        #[max_length = 66]
+        owner_address -> Varchar,
+        #[max_length = 66]
+        counterparty_address -> Nullable<Varchar>,
+        #[max_length = 66]
+        asset_type -> Nullable<Varchar>,
+        amount -> Nullable<Numeric>,
+        event_data -> Jsonb,
+        #[max_length = 20]
+        event_data_version -> Varchar,
+        block_height -> Int8,
+        is_transaction_success -> Bool,
+        #[max_length = 1000]
+        entry_function_id_str -> Nullable<Varchar>,
+        transaction_timestamp -> Timestamp,
+        inserted_at -> Timestamp,
+    }
+}
+
+diesel::table! {
     collections_v2 (transaction_version, write_set_change_index) {
         transaction_version -> Int8,
         write_set_change_index -> Int8,
@@ -965,6 +1096,8 @@ diesel::table! {
         #[max_length = 255]
         entry_function_function_name -> Nullable<Varchar>,
         replay_protection_nonce -> Nullable<Numeric>,
+        #[max_length = 50]
+        encrypted_state -> Nullable<Varchar>,
     }
 }
 
@@ -1033,6 +1166,7 @@ diesel::allow_tables_to_appear_in_same_query!(
     backfill_processor_status,
     block_metadata_transactions,
     collections_v2,
+    confidential_asset_activities,
     current_ans_lookup_v2,
     current_ans_primary_name_v2,
     current_collections_v2,
@@ -1064,9 +1198,16 @@ diesel::allow_tables_to_appear_in_same_query!(
     move_modules,
     nft_points,
     objects,
+    placement_group_slots,
     processor_status,
     proposal_votes,
     public_key_auth_keys,
+    shelby_object_activities,
+    shelby_object_parts,
+    shelby_objects,
+    shelby_open_multipart_parts,
+    shelby_open_multipart_uploads,
+    shelby_pending_blobs,
     signatures,
     spam_assets,
     table_items,
