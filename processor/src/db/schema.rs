@@ -198,6 +198,7 @@ diesel::table! {
         end_offset -> Int8,
         stored_size -> Int8,
         inserted_at -> Timestamp,
+        part_meta -> Nullable<Bytea>,
     }
 }
 
@@ -219,6 +220,9 @@ diesel::table! {
         committed_at_micros -> Int8,
         last_transaction_version -> Int8,
         inserted_at -> Timestamp,
+        multipart_meta -> Nullable<Bytea>,
+        commit_meta -> Nullable<Bytea>,
+        format_version -> Int4,
     }
 }
 
@@ -233,6 +237,8 @@ diesel::table! {
         committed_at_micros -> Int8,
         last_transaction_version -> Int8,
         inserted_at -> Timestamp,
+        part_meta -> Nullable<Bytea>,
+        format_version -> Int4,
     }
 }
 
@@ -261,6 +267,7 @@ diesel::table! {
         created_at_micros -> Int8,
         last_transaction_version -> Int8,
         inserted_at -> Timestamp,
+        multipart_meta -> Nullable<Bytea>,
     }
 }
 
